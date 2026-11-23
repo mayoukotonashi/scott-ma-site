@@ -23,7 +23,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: actions/configure-pages@v6
+        id: pages
       - name: Build the static site
+        env:
+          SCOTT_MA_SITE_URL: ${{ steps.pages.outputs.base_url }}
         run: python3 build.py
       - uses: actions/upload-pages-artifact@v5
         with:
