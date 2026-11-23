@@ -76,6 +76,26 @@ nav a[aria-current="page"] { font-weight: 650; }
 .resource-links .primary { background: var(--green); color: #fff; padding: .65rem .95rem; text-decoration: none; }
 .resource-links .primary:hover { background: #365947; }
 .article-citation { color: var(--muted); line-height: 1.65; margin-bottom: 1.4rem; }
+.article-hook { font: 1.35rem/1.55 var(--serif); }
+.article-section { margin-top: 2.2rem; }
+.article-section h2:first-child { border-top: 1px solid var(--line); padding-top: .8rem; }
+.article-section h3 { color: var(--green); font-size: 1.35rem; line-height: 1.35; margin-top: 1.65rem; }
+.article-section p + p, .article-section h2 + p, .article-section h3 + p { margin-top: .8rem; }
+.full-text-credit { color: var(--muted); font-size: .9rem; }
+.dissertation-title { color: var(--muted); font: 1.3rem/1.45 var(--serif); }
+.prose .keywords { display: flex; flex-wrap: wrap; gap: .4rem .5rem; list-style: none; padding: 0; margin-top: .8rem; }
+.prose .keywords li { border: 1px solid var(--line); padding: .16rem .58rem; margin: 0; font-size: .88rem; }
+
+.field-gallery { border-top: 1px solid var(--line); margin-top: clamp(2.5rem, 6vw, 4.75rem); padding-top: clamp(1.35rem, 3vw, 2.1rem); }
+.home-body + .frame .field-gallery { margin-top: 0; margin-bottom: clamp(3.4rem, 7vw, 6rem); }
+.field-gallery h2 { color: var(--green); font-size: clamp(1.8rem, 4vw, 2.8rem); line-height: 1.1; letter-spacing: -.035em; margin-bottom: 1.4rem; }
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: 1.4rem; }
+.gallery-grid figure { margin: 0; }
+.gallery-grid figure:only-child { max-width: 43rem; }
+.gallery-grid img { width: 100%; aspect-ratio: 1.5; object-fit: contain; background: var(--panel); border: 1px solid var(--line); }
+.gallery-grid figure:only-child img { aspect-ratio: auto; }
+.gallery-grid figcaption { margin-top: .6rem; font-size: .93rem; line-height: 1.5; }
+.gallery-grid small { color: var(--muted); font-size: .81rem; line-height: 1.5; }
 
 .publications { max-width: 57rem; }
 .filters { display: flex; align-items: end; gap: 1rem; margin-bottom: 1rem; }
