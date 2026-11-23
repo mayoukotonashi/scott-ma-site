@@ -126,7 +126,7 @@ def write_profile_pages():
       <p class="tagline">{tagline}</p>
       <p class="affiliation">{affiliation}</p>
     </div>
-    <figure class="portrait"><img src="./assets/scott-ma.webp" width="200" height="200" alt="Portrait of {name}"></figure>
+    <figure class="portrait"><img src="./assets/scott-ma.webp" width="200" height="200" alt="Black-and-white Japanese illustration with figures and handwritten text"></figure>
   </div></div>
   <div class="frame home-body">
     <section>

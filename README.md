@@ -11,7 +11,7 @@ The website builds to ordinary HTML, CSS, and JavaScript. The source has no pack
 | Research page | `src/research.md` |
 | Curriculum vitae | `src/cv.md` |
 | Articles, summaries, or external links | `src/publications.json` |
-| Portrait | `src/assets/scott-ma.webp` |
+| Profile illustration | `src/assets/scott-ma.webp` |
 | Layout and typography | `src/templates/base.html` and `src/assets/site.css` |
 
 The text files support paragraphs, second-level headings, bullets, and italic emphasis. Preserve existing publication slugs to keep their URLs working. Add an HTTPS publisher or DOI URL and any available public PDF link for new entries. The build sorts publications by year and generates the index, detail pages, filters, sitemap, and BibTeX exports.
