@@ -63,7 +63,8 @@
     "doi": "10.1080/18692729.2023.2220467",
     "publicText": "homi-version-of-record.txt",
     "publicTextEdition": "version-of-record",
-    "publicTextLabel": "Full text"
+    "publicTextLabel": "Full text",
+    "readingPdf": "homi-reading-edition.pdf"
   },
   {
     "slug": "chinatown",
@@ -92,7 +93,8 @@
     "doi": "10.1215/10679847-11924334",
     "publicText": "chinatown-version-of-record.txt",
     "publicTextEdition": "version-of-record",
-    "publicTextLabel": "Full text"
+    "publicTextLabel": "Full text",
+    "readingPdf": "chinatown-reading-edition.pdf"
   },
   {
     "slug": "hamatora",
@@ -122,7 +124,8 @@
     "issueOnly": true,
     "publicText": "hamatora-version-of-record.txt",
     "publicTextEdition": "version-of-record",
-    "publicTextLabel": "Full text"
+    "publicTextLabel": "Full text",
+    "readingPdf": "hamatora-reading-edition.pdf"
   },
   {
     "slug": "port",
@@ -187,7 +190,8 @@
     "doi": "10.1386/eapc_00111_1",
     "publicText": "isekai-version-of-record.txt",
     "publicTextEdition": "version-of-record",
-    "publicTextLabel": "Full text"
+    "publicTextLabel": "Full text",
+    "readingPdf": "isekai-reading-edition.pdf"
   },
   {
     "slug": "nagasaki",
@@ -219,7 +223,8 @@
     "doi": "10.1080/13642529.2023.2206727",
     "publicText": "nagasaki-version-of-record.txt",
     "publicTextEdition": "version-of-record",
-    "publicTextLabel": "Full text"
+    "publicTextLabel": "Full text",
+    "readingPdf": "nagasaki-reading-edition.pdf"
   },
   {
     "slug": "japonisme",
@@ -248,6 +253,7 @@
     "doi": "10.1163/24054992-08010001",
     "publicText": "japonisme-version-of-record.txt",
     "publicTextEdition": "version-of-record",
-    "publicTextLabel": "Full text"
+    "publicTextLabel": "Full text",
+    "readingPdf": "japonisme-reading-edition.pdf"
   }
 ]
