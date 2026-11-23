@@ -13,7 +13,7 @@
     "link": "https://muse.jhu.edu/article/960865",
     "abstract": "This article studies the Japanese web novel, which, despite having come to represent a substantial segment of the Japanese market for literature over the course of two decades, remains almost unstudied in English-language academia. To analyze their case, the authors examine in turn the media history of Japanese web novels, the online platforms on which they are written, and the aesthetic elements of its storyworld. The article also closely examines the economic rationale underlying its success within the current Japanese culture industry, allowing a distinction between the auteurist, qualitative judgment characteristic of traditional popular literature and the audience-driven, quantitative judgment characteristic of industry trends following the ascendence of the web novel. It additionally introduces the concept of 1.5-ji sōsaku (1.5次創作) or “semi-original works” to describe how web novels exist between being original and derivative, and studies the history of the isekai (“other world”) genre as an example. Last, the article notes the similarities between the Japanese model and other models of web novel platforms in East Asia, calling for greater comparisons and theoretical exegeses of these cases.",
     "hook": "Japanese web novels grew into a major segment of the literary market through platforms that judge work by audience response. This article traces the medium’s history, explains the economics of online publishing, and uses isekai (異世界) to show how fiction on these platforms can combine original storytelling with familiar narrative conventions. It closes by situating the Japanese case alongside other East Asian web-novel industries.",
-    "abstractLabel": "Abstract",
+    "abstractLabel": "Author’s abstract",
     "keywords": [
       "web novel",
       "anime",
@@ -60,8 +60,6 @@
     "publicationDate": "2025-01-02",
     "doi": "10.1080/18692729.2023.2220467",
     "publicPdf": "multiculturalism-accepted-manuscript.pdf",
-    "publicText": "multiculturalism-accepted-manuscript.txt",
-    "publicTextLabel": "Read accepted manuscript",
     "publicPdfLabel": "Accepted manuscript (PDF)",
     "publicVersionNote": "This is an Accepted Manuscript of an article published by Taylor & Francis in Contemporary Japan on June 5, 2023, available online at https://doi.org/10.1080/18692729.2023.2220467."
   },
@@ -78,7 +76,7 @@
     "link": "https://doi.org/10.1215/10679847-11924334",
     "abstract": "The contemporary discourse surrounding the Japanese “Chinatown” relies on the “antinomy of Chinese humanity.” This antinomy holds together two individually reasonable statements: first, that a Chinatown houses Chinese inhabitants, and second, that no essential characteristic of Chinese people or Chinatowns exists. Interpreting Jacques Lacan’s theory of discourse, the article distinguishes two main sub-discourses that revolve around this antinomy in different ways. Whereas the activist discourse identifies with this Chinese community and argues that the Japanese public should recognize its difference, the academic discourse views Chinatowns from above to categorize them on the basis of their supposed authenticity. Using concrete examples of these discourses, this article performs close readings of the works of two influential actors in the construction of Chinatown: Yokohama Chinatown leader Hayashi Kensei, and cultural geographer Yamashita Kiyomi, respectively. The article specifically notes the operation of enjoyment in the repetition of their discourses and the implicit economic complicity in their explicitly cultural or scholastic speech. It also compares these thinkers with other influential participants in the discourse and contextualizes them within the history of Chinatown’s postwar touristification. A psychoanalytic critique of Chinatown allows us to recognize the limits of humanistic ideologies and imagine new modes of seeing Chinatown.",
     "hook": "This article uses Jacques Lacan’s theory of discourse to examine how activists and scholars describe Japanese Chinatowns. It compares calls to recognize a distinct community with scholarly efforts to judge the authenticity of Chinatowns. Through the case of Yokohama (横浜), it asks how these accounts relate to the neighborhood’s development as a tourist destination and to the economic interests invested in its image.",
-    "abstractLabel": "Abstract",
+    "abstractLabel": "Author’s abstract",
     "keywords": [
       "psychoanalysis",
       "capitalism",
@@ -90,8 +88,6 @@
     "publicationDate": "2025-11-01",
     "doi": "10.1215/10679847-11924334",
     "publicPdf": "chinatown-accepted-manuscript.pdf",
-    "publicText": "chinatown-accepted-manuscript.txt",
-    "publicTextLabel": "Read accepted manuscript",
     "publicPdfLabel": "Accepted manuscript (PDF)",
     "publicVersionNote": "Author’s accepted manuscript. Published version © 2025 Duke University Press. The published article in positions: asia critique is available at https://doi.org/10.1215/10679847-11924334."
   },
@@ -119,12 +115,7 @@
     "issue": "65",
     "publicationDate": "2024",
     "doi": "10.1353/jwj.2024.a922154",
-    "issueOnly": true,
-    "publicText": "western-elegance-author-preprint.txt",
-    "publicPdf": "western-elegance-author-preprint.pdf",
-    "publicTextLabel": "Full text (author preprint)",
-    "publicPdfLabel": "Preprint (PDF)",
-    "publicVersionNote": "Author’s original manuscript, October 2022. The final, peer-reviewed article was published in U.S.-Japan Women’s Journal, no. 65 (2024), pp. 25–55. https://doi.org/10.1353/jwj.2024.a922154. This copy includes the submitted text and its original figure captions."
+    "issueOnly": true
   },
   {
     "slug": "67051-a-lesson-in-port-citizenship-regimes-of-historicity-in-maritime-museums-in-yokohama-japan-1961-2022",
@@ -184,12 +175,7 @@
     ],
     "issue": "2",
     "publicationDate": "2023-09-25",
-    "doi": "10.1386/eapc_00111_1",
-    "publicText": "isekai-author-preprint.txt",
-    "publicPdf": "isekai-author-preprint.pdf",
-    "publicTextLabel": "Full text (author preprint)",
-    "publicPdfLabel": "Preprint (PDF)",
-    "publicVersionNote": "This is a pre-peer-review preprint © Scott Ma 2022. The definitive, peer-reviewed and edited version is published in East Asian Journal of Popular Culture 9, no. 2 (2023), pp. 281–297, https://doi.org/10.1386/eapc_00111_1."
+    "doi": "10.1386/eapc_00111_1"
   },
   {
     "slug": "67054-global-history-in-two-chronotopes-time-identity-and-the-practical-past-in-nagasaki-japan-1990-and-2006",
@@ -219,8 +205,6 @@
     "publicationDate": "2023-05-01",
     "doi": "10.1080/13642529.2023.2206727",
     "publicPdf": "global-history-accepted-manuscript.pdf",
-    "publicText": "global-history-accepted-manuscript.txt",
-    "publicTextLabel": "Read accepted manuscript",
     "publicPdfLabel": "Accepted manuscript (PDF)",
     "publicVersionNote": "This is an Accepted Manuscript of an article published by Taylor & Francis in Rethinking History on May 1, 2023, available online at https://doi.org/10.1080/13642529.2023.2206727."
   },
@@ -249,8 +233,6 @@
     "publicationDate": "2023-04",
     "doi": "10.1163/24054992-08010001",
     "publicPdf": "japonisme-accepted-manuscript.pdf",
-    "publicText": "japonisme-accepted-manuscript.txt",
-    "publicTextLabel": "Read accepted manuscript",
     "publicPdfLabel": "Accepted manuscript (PDF)",
     "publicVersionNote": "This is the author’s accepted manuscript of an article published by Brill in Journal of Japonisme. The published article is available at https://doi.org/10.1163/24054992-08010001."
   }
