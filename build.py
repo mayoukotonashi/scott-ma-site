@@ -119,11 +119,14 @@ def write_alias(route, target):
     path.write_text(
         f'''<!doctype html>
 <html lang="en">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="refresh" content="0;url={relative}">
-<link rel="canonical" href="{origin_url(target)}">
+<link rel="canonical" href="{escape(origin_url(target))}">
 <title>Page moved | {escape(SITE["name"])}</title>
+<script>location.replace({json.dumps(relative)} + location.search + location.hash);</script>
+<noscript><meta http-equiv="refresh" content="0;url={relative}"></noscript>
+</head>
 <p>This page has moved. <a href="{relative}">Continue to the new address</a>.</p>
 </html>
 ''',
@@ -158,7 +161,7 @@ def gallery_html(location, asset_prefix):
         if image["location"] != location:
             continue
         asset = escape(asset_path(image["asset"]).name)
-        caption = escape(image["caption"])
+        caption = inline(image["caption"])
         alt = escape(image["alt"])
         credit = escape(image["credit"])
         source = https_url(image["source"])
@@ -193,19 +196,16 @@ def write_profile_pages():
     <figure class="portrait"><img src="./assets/scott-ma.webp" width="200" height="200" alt="Black-and-white Japanese illustration with figures and handwritten text"></figure>
   </div></div>
   <div class="frame home-body">
-    <div>
-      <section>
-        <h2>About</h2>
-        <div class="prose">{markdown("home")}</div>
-      </section>
+    <section class="prose" aria-label="Biography">{markdown("home")}</section>
+    <div class="home-sidebar">
       <aside class="research-card" aria-labelledby="project-title">
         <p class="label">Dissertation</p>
-        <h3 id="project-title">{project}</h3>
+        <h2 id="project-title">{project}</h2>
         <p>{subtitle}</p>
         <a href="./research/">Read about the project</a>
       </aside>
+      {gallery_html("home", "./assets/")}
     </div>
-    {gallery_html("home", "./assets/")}
   </div>
 </main>''')
     dissertation_title = SITE["researchTitle"]
@@ -253,11 +253,16 @@ def paper_doi(paper):
 
 def validated_publications():
     seen = set()
+    legacy_seen = set()
     for paper in PUBLICATIONS:
         slug = paper["slug"]
-        if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", slug) or slug in seen:
+        if not re.fullmatch(r"[a-z][a-z0-9]*", slug) or slug in seen:
             raise ValueError(f"Invalid or duplicate publication slug: {slug}")
         seen.add(slug)
+        if legacy := paper.get("legacySlug"):
+            if not re.fullmatch(r"\d+-[a-z0-9]+(?:-[a-z0-9]+)*", legacy) or legacy in legacy_seen:
+                raise ValueError(f"Invalid or duplicate legacy publication slug: {legacy}")
+            legacy_seen.add(legacy)
         for link in [paper["link"], *(item["url"] for item in paper.get("links", []))]:
             https_url(link)
         if (paper.get("publicPdf") or paper.get("publicText")) and paper.get("publicPdfLabel") != "Version of record (PDF)":
@@ -287,7 +292,8 @@ def bibtex(paper):
     if paper_doi(paper):
         fields["doi"] = paper_doi(paper)
     key = re.sub(r"[^a-zA-Z0-9]", "", paper["authors"][0].split()[-1])
-    key += str(paper["year"]) + "-" + paper["slug"].split("-")[0]
+    previous_id = paper.get("legacySlug", paper["slug"]).split("-", 1)[0]
+    key += str(paper["year"]) + "-" + previous_id
     entries = ",\n".join(f"  {field} = {{{value}}}" for field, value in fields.items())
     return f"@article{{{key},\n{entries}\n}}\n"
 
@@ -348,7 +354,6 @@ def write_publication(paper, previous, following):
     keywords = article_section("article-keywords", keywords_label, f'<ul class="keywords">{keywords}</ul>') if keywords else ""
     edition_label = paper.get("publicTextLabel", "Full text")
     edition, headings, figures = publication_text(paper)
-    other_version = publication_version_note(paper) if not edition else ""
     contents = [("article-abstract", abstract_label)] if abstract else []
     if keywords:
         contents.append(("article-keywords", keywords_label))
@@ -371,11 +376,11 @@ def write_publication(paper, previous, following):
       {abstract}
       {keywords}
       {edition}
-      {other_version}
     </article>
   </div>
   <div class="frame">{article_neighbors(previous, following)}</div>
-</main>'''
+</main>
+<script src="../../assets/article-reader.js" defer></script>'''
     metadata = publication_metadata(paper, route, description, record_pdf_url)
     write_page(route, f'{title} | {SITE["name"]}', description,
                content, active="publications", extra_head=metadata, article=True)
@@ -454,24 +459,18 @@ def article_section(section_id, label, body):
 </section>''' if body else ""
 
 
-def publication_version_note(paper):
-    note = paper.get("publicVersionNote", "")
-    return f'<p class="public-version-note">{escape(note)}</p>' if note else ""
-
-
 def publication_text(paper):
     if not paper.get("publicText"):
         return "", [], set()
     text = asset_path(paper["publicText"]).read_text(encoding="utf-8")
     authors = escape(", ".join(paper["authors"]))
     credit = f'<p class="full-text-credit">{authors}. {citation(paper, include_year=True)}'
-    credit += f' <a href="{https_url(paper["link"])}">Publication details at the publisher</a>.'
     if paper.get("license"):
         license_url = https_url(paper["license"]["url"])
         license_label = escape(paper["license"]["label"])
         credit += f' <a href="{license_url}">{license_label}</a>.'
     body, headings, figures = article_markdown(text)
-    body = credit + "</p>" + publication_version_note(paper) + body
+    body = credit + "</p>" + body
     return article_section("article-text", paper.get("publicTextLabel", "Full text"), body), headings, figures
 
 
@@ -563,7 +562,8 @@ def article_footnotes(notes, references):
             f'aria-label="Back to note {number}, reference {index}">↩</a>'
             for index, target in enumerate(references.get(number, []), 1)
         )
-        items.append(f'<li id="footnote-{number}" value="{number}" tabindex="-1">{text}{backlinks}</li>')
+        items.append(f'<li id="footnote-{number}" value="{number}" tabindex="-1">'
+                     f'<span class="note-text">{text}</span>{backlinks}</li>')
     return f'<ol class="article-list article-notes">{"".join(items)}</ol>'
 
 
@@ -609,30 +609,41 @@ def publication_metadata(paper, route, description, pdf_url):
     return meta + "\n  " + structured_data(**article)
 
 
-def build():
-    if OUTPUT.exists():
-        shutil.rmtree(OUTPUT)
-    (OUTPUT / "assets").mkdir(parents=True)
-    site_assets = {"favicon.svg", "site.css", "scott-ma.webp", "publications.js"}
-    site_assets.update(image["asset"] for image in GALLERY)
-    for name in sorted(site_assets):
-        shutil.copyfile(asset_path(name), OUTPUT / "assets" / name)
-    write_profile_pages()
-    write_publications()
-    page_aliases = {
+def site_aliases():
+    aliases = {
         "pages/9881": "research",
         "pages/9882": "cv",
         "privacy_policy": "privacy",
         "confucius": "research",
         "cvit": "cv",
     }
-    for old, new in page_aliases.items():
-        write_alias(old, new)
-    article_aliases = {"67052": "isekai", "67055": "japonisme", "67054": "nagasaki", "67048": "homi"}
     for paper in PUBLICATIONS:
-        alias = article_aliases.get(paper["slug"].split("-")[0])
-        if alias:
-            write_alias(alias, f'publications/{paper["slug"]}')
+        slug = paper["slug"]
+        target = f"publications/{slug}"
+        if legacy := paper.get("legacySlug"):
+            aliases[f"publications/{legacy}"] = target
+        if slug in {"isekai", "japonisme", "nagasaki", "homi"}:
+            aliases[slug] = target
+    return aliases
+
+
+def build():
+    if OUTPUT.exists():
+        shutil.rmtree(OUTPUT)
+    (OUTPUT / "assets").mkdir(parents=True)
+    site_assets = {"article-reader.js", "favicon.svg", "site.css", "scott-ma.webp", "publications.js"}
+    site_assets.update(image["asset"] for image in GALLERY)
+    for name in sorted(site_assets):
+        shutil.copyfile(asset_path(name), OUTPUT / "assets" / name)
+    write_profile_pages()
+    write_publications()
+    for old, new in site_aliases().items():
+        write_alias(old, new)
+        if old.startswith("publications/"):
+            for filename in ("citation.bib", "version-of-record.pdf"):
+                source = OUTPUT / new / filename
+                if source.is_file():
+                    shutil.copyfile(source, OUTPUT / old / filename)
     urls = [origin_url(route) for route in [*NAVIGATION, *(f'publications/{paper["slug"]}' for paper in PUBLICATIONS)]]
     urls.extend(f'{origin_url(f"publications/{paper["slug"]}")}{publication_pdf_name(paper)}'
                 for paper in PUBLICATIONS if publication_pdf_name(paper))

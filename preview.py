@@ -8,7 +8,7 @@ from pathlib import Path
 import re
 from urllib.parse import urlsplit
 
-from build import OUTPUT, PROJECT, build
+from build import OUTPUT, PROJECT, build, site_aliases
 
 
 def data_url(path):
@@ -27,10 +27,11 @@ def convert_links(body, folder):
         if url.scheme or url.netloc or not url.path:
             return match[0]
         target = (folder / url.path).resolve()
+        fragment = f"#{escape(url.fragment)}" if url.fragment else ""
         if target.is_dir():
             route = target.relative_to(OUTPUT).as_posix().strip(".")
-            return f'{attribute}="#/{route}"'
-        href = data_url(target)
+            return f'{attribute}="#/{route}{fragment}"'
+        href = data_url(target) + fragment
         if attribute == "href" and target.suffix == ".bib":
             return f'href="{href}" data-download-name="{escape(target.name)}"'
         return f'{attribute}="{href}"'
@@ -54,22 +55,26 @@ def preview():
 
     styles = (OUTPUT / "assets/site.css").read_text(encoding="utf-8")
     filters = (OUTPUT / "assets/publications.js").read_text(encoding="utf-8")
+    reader = (OUTPUT / "assets/article-reader.js").read_text(encoding="utf-8")
     favicon = data_url(OUTPUT / "assets/favicon.svg")
-    script = r"""
+    script = f"const aliases = new Map(Object.entries({json.dumps(site_aliases())}));\n" + r"""
 const app = document.querySelector("#site");
 const pages = new Map(
   [...document.querySelectorAll("template[data-route]")].map((page) => [page.dataset.route, page])
 );
 let activeRoute;
+let resetArticleReader;
 function render() {
   const [path, anchor] = location.hash.replace(/^#\/?/, "").split("#", 2);
   const route = path.replace(/\/$/, "");
-  const page = pages.get(route) || pages.get("");
+  const page = pages.get(aliases.get(route) || route) || pages.get("");
   if (activeRoute !== page.dataset.route) {
+    resetArticleReader?.();
     app.replaceChildren(page.content.cloneNode(true));
     activeRoute = page.dataset.route;
     document.title = page.dataset.title;
     initializePublicationFilters(app);
+    resetArticleReader = initializeArticleReader(app);
     app.querySelectorAll("[data-download-name]").forEach((link) => {
       link.download = link.dataset.downloadName;
     });
@@ -118,6 +123,7 @@ render();
   <div id="site"></div>
   {"".join(templates)}
   <script>{filters}
+{reader}
 {script}</script>
 </body>
 </html>
