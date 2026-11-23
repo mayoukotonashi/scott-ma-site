@@ -198,13 +198,13 @@ def write_profile_pages():
   <div class="frame home-body">
     <section class="prose" aria-label="Biography">{markdown("home")}</section>
     <div class="home-sidebar">
+      {gallery_html("home", "./assets/")}
       <aside class="research-card" aria-labelledby="project-title">
         <p class="label">Dissertation</p>
         <h2 id="project-title">{project}</h2>
         <p>{subtitle}</p>
         <a href="./research/">Read about the project</a>
       </aside>
-      {gallery_html("home", "./assets/")}
     </div>
   </div>
 </main>''')
@@ -380,7 +380,7 @@ def write_publication(paper, previous, following):
   </div>
   <div class="frame">{article_neighbors(previous, following)}</div>
 </main>
-<script src="../../assets/article-reader.js" defer></script>'''
+<script src="../../assets/article-reader.js?v=5" defer></script>'''
     metadata = publication_metadata(paper, route, description, record_pdf_url)
     write_page(route, f'{title} | {SITE["name"]}', description,
                content, active="publications", extra_head=metadata, article=True)
@@ -418,9 +418,11 @@ def article_neighbors(previous, following, edge=False):
         title = escape(paper["title"])
         info = f'<span class="label">{label}</span><span class="neighbor-title">{title}</span>'
         if edge:
+            tab_label = label.removesuffix(" article")
             links.append(f'''<a class="article-edge article-edge-{direction}" href="{href}" rel="{direction}" aria-label="{label}, {title}">
-  <span class="article-edge-panel"><span class="article-edge-arrow" aria-hidden="true">{arrow}</span>
-  <span class="article-edge-text">{info}</span></span>
+  <span class="article-edge-arrow" aria-hidden="true">{arrow}</span>
+  <span class="article-edge-label">{tab_label}</span>
+  <span class="neighbor-title">{title}</span>
 </a>''')
         else:
             links.append(f'''<a href="{href}" rel="{direction}">
@@ -482,6 +484,12 @@ def article_markdown(content):
     ordered = re.compile(r"(?m)^(\d+)\\?[.)][ \t]+")
     footnote = re.compile(r"(?m)^\[\^(\d+)\]:[ \t]+")
     available_notes = {int(marker[1]) for marker in footnote.finditer(content)}
+    reference_entry = re.compile(r"(?m)^\[@([a-z0-9-]+)\]:[ \t]+")
+    available_citations = reference_entry.findall(content)
+    if len(available_citations) != len(set(available_citations)):
+        raise ValueError("Duplicate article bibliography entry")
+    available_citations = set(available_citations)
+    author_date = re.compile(r"\[@([a-z0-9-]+)\|([^\]\n]+)\]")
     figure_pattern = r"!\[([^\]\n]+)\]\(([a-zA-Z0-9][a-zA-Z0-9._-]*\.(?:webp|jpe?g|png))\)"
     caption_pattern = r"(?:Figure|Fig\.|Table)\s+\d+[.:]"
     content = re.sub(rf"({figure_pattern})\n\s*\n(?={caption_pattern})", r"\1\n", content)
@@ -497,8 +505,16 @@ def article_markdown(content):
             return (f'<sup class="note-ref" id="{anchor}" tabindex="-1">'
                     f'<a href="#footnote-{number}" role="doc-noteref" aria-label="Note {number}">{number}</a></sup>')
 
+        def citation_reference(match):
+            key, label = match.groups()
+            if key not in available_citations:
+                raise ValueError(f"Missing article bibliography entry {key}")
+            return (f'<a class="author-date-citation" data-reader-note="Citation" '
+                    f'href="#reference-{key}">{label}</a>')
+
         text = re.sub(r"\[([^\]\n]+)\]\((\./version-of-record\.pdf#page=\d+)\)",
                       r'<a href="\2">\1</a>', inline(text))
+        text = author_date.sub(citation_reference, text)
         return re.sub(r"\[\^(\d+)\]", note_reference, text)
 
     blocks = []
@@ -530,6 +546,11 @@ def article_markdown(content):
 </figure>''')
         elif re.match(caption_pattern, block):
             parts.append(f'<p class="article-caption">{render_inline(" ".join(block.splitlines()))}</p>')
+        elif entry := reference_entry.match(block):
+            key = entry[1]
+            text = render_inline(" ".join(block[entry.end():].splitlines()))
+            parts.append(f'<p class="article-reference" id="reference-{key}" tabindex="-1">'
+                         f'<span class="note-text">{text}</span></p>')
         elif footnote.match(block):
             if notes_position is None:
                 notes_position = len(parts)
