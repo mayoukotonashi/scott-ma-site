@@ -338,7 +338,7 @@ def write_publication(paper, previous, following):
     hook = paper.get("hook", "")
     description = hook or summary or f"{title}, by {authors}."
     pdf_name = publication_pdf_name(paper)
-    pdf_url = f"{origin_url(route)}{pdf_name}" if pdf_name else ""
+    record_pdf_url = f"{origin_url(route)}{pdf_name}" if pdf_name == "version-of-record.pdf" else ""
     hook_html = f'<p class="article-hook">{inline(hook)}</p>' if hook else ""
     abstract_label = paper.get("abstractLabel", "Summary")
     abstract = article_section("article-abstract", abstract_label, markdown_text(summary, heading_level=3))
@@ -372,7 +372,7 @@ def write_publication(paper, previous, following):
   </div>
   <div class="frame">{article_neighbors(previous, following)}</div>
 </main>'''
-    metadata = publication_metadata(paper, route, description, pdf_url)
+    metadata = publication_metadata(paper, route, description, record_pdf_url)
     write_page(route, f'{title} | {SITE["name"]}', description,
                content, active="publications", extra_head=metadata, article=True)
     (OUTPUT / route / "citation.bib").write_text(bibtex(paper), encoding="utf-8")
@@ -421,11 +421,10 @@ def publication_pdf_name(paper):
 
 
 def publication_links(paper, pdf_name):
-    primary = "" if pdf_name else ' class="primary"'
-    links = [f'<a{primary} href="{https_url(paper["link"])}">Publisher page</a>']
+    links = [f'<a class="primary" href="{https_url(paper["link"])}">Publisher version of record</a>']
     pdf_label = paper.get("publicPdfLabel", "Version of record (PDF)")
     if pdf_name:
-        links.insert(0, f'<a class="primary" href="./{pdf_name}">{escape(pdf_label)}</a>')
+        links.append(f'<a href="./{pdf_name}">{escape(pdf_label)}</a>')
         if paper.get("license") and not paper.get("publicText"):
             license_url = https_url(paper["license"]["url"])
             license_label = escape(paper["license"]["label"])
