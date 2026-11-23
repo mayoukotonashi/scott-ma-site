@@ -44,6 +44,9 @@ def markdown_text(content, heading_level=2):
         elif all(line.startswith("- ") for line in lines):
             items = "".join(f"<li>{inline(line[2:])}</li>" for line in lines)
             parts.append(f"<ul>{items}</ul>")
+        elif all(line.startswith("> ") for line in lines):
+            quote = inline(" ".join(line[2:] for line in lines))
+            parts.append(f"<blockquote><p>{quote}</p></blockquote>")
         else:
             parts.append(f"<p>{inline(' '.join(lines))}</p>")
     return "\n".join(parts)
@@ -127,20 +130,24 @@ def write_alias(route, target):
     )
 
 
-def page_header(heading, subtitle="", label="", back=False):
+def page_header(heading, subtitle="", label="", back=False, split_title=False):
     back_link = '<a class="back-link" href="../">All publications</a>' if back else ""
     context = f'<p class="label">{escape(label)}</p>' if label else ""
     deck = f'<p class="subtitle">{escape(subtitle)}</p>' if subtitle else ""
+    title = escape(heading)
+    if split_title and ": " in heading:
+        lead, continuation = heading.split(": ", 1)
+        title = f'{escape(lead)}: <span class="title-continuation">{escape(continuation)}</span>'
     style = "page-head article-head" if back else "page-head"
     return f'''<div class="{style}"><div class="frame">
-  {back_link}{context}<h1>{escape(heading)}</h1>{deck}
+  {back_link}{context}<h1>{title}</h1>{deck}
 </div></div>'''
 
 
-def prose_page(heading, body, *, subtitle="", label="", gallery=""):
+def prose_page(heading, body):
     return f'''<main id="main">
-  {page_header(heading, subtitle, label)}
-  <div class="frame page-body"><div class="prose">{body}</div>{gallery}</div>
+  {page_header(heading)}
+  <div class="frame page-body"><div class="prose">{body}</div></div>
 </main>'''
 
 
@@ -160,7 +167,7 @@ def gallery_html(location, asset_prefix):
         provenance = " · ".join(filter(None, (credit, f'<a href="{source}">Source</a>', rights)))
         figures.append(f'''<figure>
   <img src="{asset_prefix}{asset}" alt="{alt}" loading="lazy" decoding="async">
-  <figcaption>{caption}<br><small>{provenance}</small></figcaption>
+  <figcaption><span class="figure-caption">{caption}</span><small>{provenance}</small></figcaption>
 </figure>''')
     if not figures:
         return ""
@@ -203,12 +210,19 @@ def write_profile_pages():
 </main>''')
     dissertation_title = SITE.get("dissertationTitle", SITE["researchTitle"])
     dissertation_description = f"{dissertation_title}. Dissertation research by {SITE['name']}."
-    dissertation = f'<p class="dissertation-title">{escape(dissertation_title)}</p>\n<h2>Dissertation abstract</h2>\n'
-    dissertation += markdown("research")
+    dissertation = f'''<main id="main" class="research-page">
+  {page_header(dissertation_title, label="Dissertation", split_title=True)}
+  <div class="frame page-body dissertation-layout">
+    <section class="prose dissertation-abstract" aria-labelledby="dissertation-abstract">
+      <h2 id="dissertation-abstract">Dissertation abstract</h2>
+      {markdown("research")}
+    </section>
+    {gallery_html("research", "../assets/")}
+  </div>
+</main>'''
     write_page(
         "research", f'{dissertation_title} | {SITE["name"]}', dissertation_description,
-        prose_page(SITE["researchTitle"], dissertation, subtitle=SITE["researchSubtitle"], label="Dissertation",
-                   gallery=gallery_html("research", "../assets/")),
+        dissertation,
         extra_head=structured_data(**{"@type": "WebPage", "name": dissertation_title, "url": origin_url("research"),
                                      "description": dissertation_description,
                                      "author": {"@type": "Person", "name": SITE["name"]}}),
@@ -280,7 +294,7 @@ def bibtex(paper):
 def write_publications():
     papers = validated_publications()
     rows = []
-    for paper in papers:
+    for index, paper in enumerate(papers):
         slug = paper["slug"]
         year = paper["year"]
         title = escape(paper["title"])
@@ -291,7 +305,9 @@ def write_publications():
     <p class="publication-byline">{authors}</p>
     <p class="publication-journal">{citation(paper)}</p></div>
 </li>''')
-        write_publication(paper)
+        previous = papers[index - 1] if index else None
+        following = papers[index + 1] if index + 1 < len(papers) else None
+        write_publication(paper, previous, following)
 
     years = sorted({paper["year"] for paper in papers}, reverse=True)
     options = "".join(f'<option value="{year}">{year}</option>' for year in years)
@@ -314,7 +330,7 @@ def write_publications():
     (OUTPUT / "publications/scott-ma.bib").write_text("\n".join(map(bibtex, papers)), encoding="utf-8")
 
 
-def write_publication(paper):
+def write_publication(paper, previous, following):
     route = f'publications/{paper["slug"]}'
     title = paper["title"]
     authors = ", ".join(paper["authors"])
@@ -324,24 +340,37 @@ def write_publication(paper):
     pdf_name = publication_pdf_name(paper)
     pdf_url = f"{origin_url(route)}{pdf_name}" if pdf_name else ""
     hook_html = f'<p class="article-hook">{inline(hook)}</p>' if hook else ""
-    abstract = article_section(paper.get("abstractLabel", "Summary"), markdown_text(summary, heading_level=3))
+    abstract_label = paper.get("abstractLabel", "Summary")
+    abstract = article_section("article-abstract", abstract_label, markdown_text(summary, heading_level=3))
     keywords = "".join(f"<li>{escape(keyword)}</li>" for keyword in paper.get("keywords", []))
-    keywords = article_section(paper.get("keywordsLabel", "Keywords"), f'<ul class="keywords">{keywords}</ul>') if keywords else ""
-    version_note = paper.get("publicVersionNote", "")
-    version_note = f'<p class="public-version-note">{escape(version_note)}</p>' if version_note else ""
-    content = f'''<main id="main">
-  {page_header(title, authors, back=True)}
-  <div class="frame page-body">
+    keywords_label = paper.get("keywordsLabel", "Keywords")
+    keywords = article_section("article-keywords", keywords_label, f'<ul class="keywords">{keywords}</ul>') if keywords else ""
+    edition_label = paper.get("publicTextLabel", "Full text")
+    edition, headings, figures = publication_text(paper)
+    other_version = publication_version_note(paper) if not edition else ""
+    contents = [("article-abstract", abstract_label)] if abstract else []
+    if keywords:
+        contents.append(("article-keywords", keywords_label))
+    if edition:
+        contents.append(("article-text", edition_label))
+    contents.append(("article-resources", "Article links"))
+    content = f'''<main id="main" class="article-page">
+  {page_header(title, authors, back=True, split_title=True)}
+  <div class="frame article-tools" id="article-resources" tabindex="-1">
     <p class="article-citation">{citation(paper, include_year=True)}</p>
     <div class="resource-links">{publication_links(paper, pdf_name)}</div>
-    <div class="prose">
+  </div>
+  <div class="frame page-body reader-layout">
+    {article_contents(contents, headings)}
+    <article class="prose reader-body" aria-label="{escape(title)}">
       {hook_html}
       {abstract}
       {keywords}
-      {version_note}
-      {publication_text(paper)}
-    </div>
+      {edition}
+      {other_version}
+    </article>
   </div>
+  <div class="frame">{article_neighbors(previous, following)}</div>
 </main>'''
     metadata = publication_metadata(paper, route, description, pdf_url)
     write_page(route, f'{title} | {SITE["name"]}', description,
@@ -349,13 +378,46 @@ def write_publication(paper):
     (OUTPUT / route / "citation.bib").write_text(bibtex(paper), encoding="utf-8")
     if pdf_name:
         shutil.copyfile(asset_path(paper["publicPdf"]), OUTPUT / route / pdf_name)
+    for figure in figures:
+        shutil.copyfile(asset_path(figure), OUTPUT / "assets" / figure)
+
+
+def article_contents(contents, headings):
+    items = []
+    for section_id, label in contents:
+        children = ""
+        if section_id == "article-text" and headings:
+            children = "".join(
+                f'<li class="contents-level-{level}"><a href="#{escape(anchor)}">{inline(heading)}</a></li>'
+                for anchor, heading, level in headings
+            )
+            children = f'<ul class="reader-sections">{children}</ul>'
+        items.append(f'<li><a href="#{section_id}">{escape(label)}</a>{children}</li>')
+    return f'''<nav class="reader-contents" aria-labelledby="reader-contents-title">
+  <h2 id="reader-contents-title">Contents</h2>
+  <ul>{"".join(items)}</ul>
+</nav>'''
+
+
+def article_neighbors(previous, following):
+    links = []
+    for label, paper in (("Previous article", previous), ("Next article", following)):
+        if paper:
+            links.append(f'''<a href="../{escape(paper["slug"])}/">
+  <span class="label">{label}</span><span class="neighbor-title">{escape(paper["title"])}</span>
+</a>''')
+    return f'<nav class="article-neighbors" aria-label="More publications">{"".join(links)}</nav>' if links else ""
 
 
 def publication_pdf_name(paper):
     if not paper.get("publicPdf"):
         return ""
     label = paper.get("publicPdfLabel", "").casefold()
-    return "accepted-manuscript.pdf" if label.startswith("accepted manuscript") else "version-of-record.pdf"
+    if label.startswith("accepted manuscript"):
+        return "accepted-manuscript.pdf"
+    if label.startswith("preprint"):
+        return "preprint.pdf"
+    return "version-of-record.pdf"
 
 
 def publication_links(paper, pdf_name):
@@ -375,13 +437,20 @@ def publication_links(paper, pdf_name):
     return "".join(links)
 
 
-def article_section(label, body):
-    return f'<section class="article-section"><h2>{escape(label)}</h2>{body}</section>' if body else ""
+def article_section(section_id, label, body):
+    return f'''<section class="article-section" aria-labelledby="{section_id}">
+  <h2 id="{section_id}" tabindex="-1">{escape(label)}</h2>{body}
+</section>''' if body else ""
+
+
+def publication_version_note(paper):
+    note = paper.get("publicVersionNote", "")
+    return f'<p class="public-version-note">{escape(note)}</p>' if note else ""
 
 
 def publication_text(paper):
     if not paper.get("publicText"):
-        return ""
+        return "", [], set()
     text = asset_path(paper["publicText"]).read_text(encoding="utf-8")
     authors = escape(", ".join(paper["authors"]))
     credit = f'<p class="full-text-credit">{authors}. {citation(paper, include_year=True)}'
@@ -390,7 +459,42 @@ def publication_text(paper):
         license_url = https_url(paper["license"]["url"])
         license_label = escape(paper["license"]["label"])
         credit += f' <a href="{license_url}">{license_label}</a>.'
-    return article_section(paper.get("publicTextLabel", "Full text"), credit + "</p>" + markdown_text(text, heading_level=3))
+    body, headings, figures = article_markdown(text)
+    body = credit + "</p>" + publication_version_note(paper) + body
+    return article_section("article-text", paper.get("publicTextLabel", "Full text"), body), headings, figures
+
+
+def article_markdown(content):
+    parts, headings, figures = [], [], set()
+    anchors = set()
+    figure_pattern = r"!\[([^\]\n]+)\]\(([a-zA-Z0-9][a-zA-Z0-9._-]*\.(?:webp|jpe?g|png))\)"
+    caption_pattern = r"(?:Figure|Fig\.|Table)\s+\d+[.:]"
+    content = re.sub(rf"({figure_pattern})\n\s*\n(?={caption_pattern})", r"\1\n", content)
+    for block in re.split(r"\n\s*\n", content.strip()):
+        if heading := re.fullmatch(r"(#{2,3}) (.+)", block):
+            marks, label = heading.groups()
+            base = re.sub(r"[^\w]+", "-", label.casefold()).strip("-") or "heading"
+            anchor = f"section-{base}"
+            count = 1
+            while anchor in anchors:
+                count += 1
+                anchor = f"section-{base}-{count}"
+            anchors.add(anchor)
+            level = len(marks) + 1
+            headings.append((anchor, label, level))
+            parts.append(f'<h{level} id="{escape(anchor)}" tabindex="-1">{inline(label)}</h{level}>')
+        elif figure := re.fullmatch(rf"{figure_pattern}(?:\n([\s\S]+))?", block):
+            alt, filename, caption = figure.groups()
+            figures.add(filename)
+            caption = f'<figcaption>{inline(" ".join(caption.splitlines()))}</figcaption>' if caption else ""
+            parts.append(f'''<figure class="article-figure">
+  <img src="../../assets/{escape(filename)}" alt="{escape(alt)}" loading="lazy" decoding="async">{caption}
+</figure>''')
+        elif re.match(caption_pattern, block):
+            parts.append(f'<p class="article-caption">{inline(" ".join(block.splitlines()))}</p>')
+        else:
+            parts.append(markdown_text(block, heading_level=3))
+    return "\n".join(parts), headings, figures
 
 
 def publication_metadata(paper, route, description, pdf_url):

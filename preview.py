@@ -60,23 +60,45 @@ const app = document.querySelector("#site");
 const pages = new Map(
   [...document.querySelectorAll("template[data-route]")].map((page) => [page.dataset.route, page])
 );
+let activeRoute;
 function render() {
-  const route = location.hash.replace(/^#\/?/, "").replace(/\/$/, "");
+  const [path, anchor] = location.hash.replace(/^#\/?/, "").split("#", 2);
+  const route = path.replace(/\/$/, "");
   const page = pages.get(route) || pages.get("");
-  app.replaceChildren(page.content.cloneNode(true));
-  document.title = page.dataset.title;
-  initializePublicationFilters(app);
-  app.querySelectorAll("[data-download-name]").forEach((link) => {
-    link.download = link.dataset.downloadName;
-  });
-  app.querySelector(".skip-link").addEventListener("click", (event) => {
-    event.preventDefault();
-    const main = app.querySelector("main");
-    main.tabIndex = -1;
-    main.focus();
-  });
+  if (activeRoute !== page.dataset.route) {
+    app.replaceChildren(page.content.cloneNode(true));
+    activeRoute = page.dataset.route;
+    document.title = page.dataset.title;
+    initializePublicationFilters(app);
+    app.querySelectorAll("[data-download-name]").forEach((link) => {
+      link.download = link.dataset.downloadName;
+    });
+    app.querySelector(".skip-link").addEventListener("click", (event) => {
+      event.preventDefault();
+      const main = app.querySelector("main");
+      main.tabIndex = -1;
+      main.focus();
+    });
+  }
+  const heading = anchor && document.getElementById(decodeURIComponent(anchor));
+  if (heading) {
+    heading.scrollIntoView();
+    if (heading.hasAttribute("tabindex")) heading.focus({preventScroll: true});
+    return;
+  }
   window.scrollTo(0, 0);
 }
+app.addEventListener("click", (event) => {
+  const link = event.target.closest('a[href^="#"]');
+  const href = link?.getAttribute("href");
+  if (event.defaultPrevented || !href || href.startsWith("#/")) return;
+  const id = decodeURIComponent(href.slice(1));
+  if (!document.getElementById(id)) return;
+  event.preventDefault();
+  const target = "#/" + activeRoute + "#" + encodeURIComponent(id);
+  if (location.hash === target) render();
+  else location.hash = target;
+});
 window.addEventListener("hashchange", render);
 render();
 """
