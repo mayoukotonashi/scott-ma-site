@@ -27,7 +27,8 @@ NAVIGATION = {"": "Home", "research": "Research", "publications": "Publications"
 
 def inline(text):
     """Render the emphasis used in the site's Markdown files."""
-    return re.sub(r"(?<!\*)\*([^*]+)\*(?!\*)", r"<em>\1</em>", escape(text))
+    text = re.sub(r"\*\*(?=\S)(.+?)(?<=\S)\*\*", r"<strong>\1</strong>", escape(text))
+    return re.sub(r"(?<!\*)\*(?=\S)([^*]+?)(?<=\S)\*(?!\*)", r"<em>\1</em>", text)
 
 
 def markdown(name):
@@ -35,20 +36,20 @@ def markdown(name):
     return markdown_text((SOURCE / f"{name}.md").read_text(encoding="utf-8"))
 
 
-def markdown_text(content, heading_level=2):
+def markdown_text(content, heading_level=2, render_inline=inline):
     parts = []
     for block in filter(None, re.split(r"\n\s*\n", content.strip())):
         lines = block.splitlines()
         if block.startswith("## "):
-            parts.append(f"<h{heading_level}>{inline(block[3:])}</h{heading_level}>")
+            parts.append(f"<h{heading_level}>{render_inline(block[3:])}</h{heading_level}>")
         elif all(line.startswith("- ") for line in lines):
-            items = "".join(f"<li>{inline(line[2:])}</li>" for line in lines)
+            items = "".join(f"<li>{render_inline(line[2:])}</li>" for line in lines)
             parts.append(f"<ul>{items}</ul>")
         elif all(line.startswith("> ") for line in lines):
-            quote = inline(" ".join(line[2:] for line in lines))
+            quote = render_inline(" ".join(line[2:] for line in lines))
             parts.append(f"<blockquote><p>{quote}</p></blockquote>")
         else:
-            parts.append(f"<p>{inline(' '.join(lines))}</p>")
+            parts.append(f"<p>{render_inline(' '.join(lines))}</p>")
     return "\n".join(parts)
 
 
@@ -172,7 +173,6 @@ def gallery_html(location, asset_prefix):
     if not figures:
         return ""
     return f'''<section class="field-gallery" aria-label="Historical images">
-  <h2>Historical images</h2>
   <div class="gallery-grid">{"".join(figures)}</div>
 </section>'''
 
@@ -183,8 +183,6 @@ def write_profile_pages():
     affiliation = escape(SITE["affiliation"])
     project = escape(SITE["researchTitle"])
     subtitle = escape(SITE["researchSubtitle"])
-    home_gallery = gallery_html("home", "./assets/")
-    home_gallery = f'<div class="frame">{home_gallery}</div>' if home_gallery else ""
     write_page("", f'{SITE["name"]} | {SITE["tagline"]}', SITE["tagline"], f'''<main id="main">
   <div class="hero"><div class="frame hero-inner">
     <div>
@@ -195,26 +193,27 @@ def write_profile_pages():
     <figure class="portrait"><img src="./assets/scott-ma.webp" width="200" height="200" alt="Black-and-white Japanese illustration with figures and handwritten text"></figure>
   </div></div>
   <div class="frame home-body">
-    <section>
-      <h2>About</h2>
-      <div class="prose">{markdown("home")}</div>
-    </section>
-    <aside class="research-card" aria-labelledby="project-title">
-      <p class="label">Dissertation</p>
-      <h3 id="project-title">{project}</h3>
-      <p>{subtitle}</p>
-      <a href="./research/">Read about the project</a>
-    </aside>
+    <div>
+      <section>
+        <h2>About</h2>
+        <div class="prose">{markdown("home")}</div>
+      </section>
+      <aside class="research-card" aria-labelledby="project-title">
+        <p class="label">Dissertation</p>
+        <h3 id="project-title">{project}</h3>
+        <p>{subtitle}</p>
+        <a href="./research/">Read about the project</a>
+      </aside>
+    </div>
+    {gallery_html("home", "./assets/")}
   </div>
-  {home_gallery}
 </main>''')
-    dissertation_title = SITE.get("dissertationTitle", SITE["researchTitle"])
+    dissertation_title = SITE["researchTitle"]
     dissertation_description = f"{dissertation_title}. Dissertation research by {SITE['name']}."
     dissertation = f'''<main id="main" class="research-page">
-  {page_header(dissertation_title, SITE["researchSubtitle"], label="Dissertation", split_title=True)}
+  {page_header(dissertation_title, SITE["researchSubtitle"], label="Dissertation")}
   <div class="frame page-body dissertation-layout">
-    <section class="prose dissertation-abstract" aria-labelledby="dissertation-abstract">
-      <h2 id="dissertation-abstract">Dissertation abstract</h2>
+    <section class="prose dissertation-abstract" id="dissertation-abstract" aria-label="Dissertation overview">
       {markdown("research")}
     </section>
     {gallery_html("research", "../assets/")}
@@ -261,6 +260,8 @@ def validated_publications():
         seen.add(slug)
         for link in [paper["link"], *(item["url"] for item in paper.get("links", []))]:
             https_url(link)
+        if (paper.get("publicPdf") or paper.get("publicText")) and paper.get("publicPdfLabel") != "Version of record (PDF)":
+            raise ValueError(f"Public full text must use the version of record: {slug}")
         for key in ("publicPdf", "publicText"):
             if paper.get(key):
                 asset_path(paper[key])
@@ -354,12 +355,15 @@ def write_publication(paper, previous, following):
     if edition:
         contents.append(("article-text", edition_label))
     contents.append(("article-resources", "Article links"))
+    if previous or following:
+        contents.append(("article-neighbors", "More publications"))
     content = f'''<main id="main" class="article-page">
   {page_header(title, authors, back=True, split_title=True)}
   <div class="frame article-tools" id="article-resources" tabindex="-1">
     <p class="article-citation">{citation(paper, include_year=True)}</p>
     <div class="resource-links">{publication_links(paper, pdf_name)}</div>
   </div>
+  {article_neighbors(previous, following, edge=True)}
   <div class="frame page-body reader-layout">
     {article_contents(contents, headings)}
     <article class="prose reader-body" aria-label="{escape(title)}">
@@ -399,25 +403,33 @@ def article_contents(contents, headings):
 </nav>'''
 
 
-def article_neighbors(previous, following):
+def article_neighbors(previous, following, edge=False):
     links = []
-    for label, paper in (("Previous article", previous), ("Next article", following)):
-        if paper:
-            links.append(f'''<a href="../{escape(paper["slug"])}/">
-  <span class="label">{label}</span><span class="neighbor-title">{escape(paper["title"])}</span>
+    for direction, paper in (("prev", previous), ("next", following)):
+        if not paper:
+            continue
+        label, arrow = ("Previous article", "←") if direction == "prev" else ("Next article", "→")
+        href = f'../{escape(paper["slug"])}/'
+        title = escape(paper["title"])
+        info = f'<span class="label">{label}</span><span class="neighbor-title">{title}</span>'
+        if edge:
+            links.append(f'''<a class="article-edge article-edge-{direction}" href="{href}" rel="{direction}" aria-label="{label}, {title}">
+  <span class="article-edge-panel"><span class="article-edge-arrow" aria-hidden="true">{arrow}</span>
+  <span class="article-edge-text">{info}</span></span>
 </a>''')
-    return f'<nav class="article-neighbors" aria-label="More publications">{"".join(links)}</nav>' if links else ""
+        else:
+            links.append(f'''<a href="{href}" rel="{direction}">
+  {info}
+</a>''')
+    if not links:
+        return ""
+    if edge:
+        return f'<nav class="article-edges" aria-label="Article shortcuts">{"".join(links)}</nav>'
+    return f'<nav class="article-neighbors" id="article-neighbors" tabindex="-1" aria-label="More publications">{"".join(links)}</nav>'
 
 
 def publication_pdf_name(paper):
-    if not paper.get("publicPdf"):
-        return ""
-    label = paper.get("publicPdfLabel", "").casefold()
-    if label.startswith("accepted manuscript"):
-        return "accepted-manuscript.pdf"
-    if label.startswith("preprint"):
-        return "preprint.pdf"
-    return "version-of-record.pdf"
+    return "version-of-record.pdf" if paper.get("publicPdf") else ""
 
 
 def publication_links(paper, pdf_name):
@@ -466,10 +478,38 @@ def publication_text(paper):
 def article_markdown(content):
     parts, headings, figures = [], [], set()
     anchors = set()
+    notes, references = [], {}
+    notes_position = None
+    ordered = re.compile(r"(?m)^(\d+)\\?[.)][ \t]+")
+    footnote = re.compile(r"(?m)^\[\^(\d+)\]:[ \t]+")
+    available_notes = {int(marker[1]) for marker in footnote.finditer(content)}
     figure_pattern = r"!\[([^\]\n]+)\]\(([a-zA-Z0-9][a-zA-Z0-9._-]*\.(?:webp|jpe?g|png))\)"
     caption_pattern = r"(?:Figure|Fig\.|Table)\s+\d+[.:]"
     content = re.sub(rf"({figure_pattern})\n\s*\n(?={caption_pattern})", r"\1\n", content)
+
+    def render_inline(text):
+        def note_reference(match):
+            number = int(match[1])
+            if number not in available_notes:
+                raise ValueError(f"Missing article footnote {number}")
+            targets = references.setdefault(number, [])
+            anchor = f"note-ref-{number}-{len(targets) + 1}"
+            targets.append(anchor)
+            return (f'<sup class="note-ref" id="{anchor}" tabindex="-1">'
+                    f'<a href="#footnote-{number}" role="doc-noteref" aria-label="Note {number}">{number}</a></sup>')
+
+        text = re.sub(r"\[([^\]\n]+)\]\((\./version-of-record\.pdf#page=\d+)\)",
+                      r'<a href="\2">\1</a>', inline(text))
+        return re.sub(r"\[\^(\d+)\]", note_reference, text)
+
+    blocks = []
     for block in re.split(r"\n\s*\n", content.strip()):
+        if blocks and ordered.match(blocks[-1]) and ordered.match(block):
+            blocks[-1] += "\n" + block
+        else:
+            blocks.append(block)
+
+    for block in blocks:
         if heading := re.fullmatch(r"(#{2,3}) (.+)", block):
             marks, label = heading.groups()
             base = re.sub(r"[^\w]+", "-", label.casefold()).strip("-") or "heading"
@@ -481,19 +521,50 @@ def article_markdown(content):
             anchors.add(anchor)
             level = len(marks) + 1
             headings.append((anchor, label, level))
-            parts.append(f'<h{level} id="{escape(anchor)}" tabindex="-1">{inline(label)}</h{level}>')
+            parts.append(f'<h{level} id="{escape(anchor)}" tabindex="-1">{render_inline(label)}</h{level}>')
         elif figure := re.fullmatch(rf"{figure_pattern}(?:\n([\s\S]+))?", block):
             alt, filename, caption = figure.groups()
             figures.add(filename)
-            caption = f'<figcaption>{inline(" ".join(caption.splitlines()))}</figcaption>' if caption else ""
+            caption = f'<figcaption>{render_inline(" ".join(caption.splitlines()))}</figcaption>' if caption else ""
             parts.append(f'''<figure class="article-figure">
   <img src="../../assets/{escape(filename)}" alt="{escape(alt)}" loading="lazy" decoding="async">{caption}
 </figure>''')
         elif re.match(caption_pattern, block):
-            parts.append(f'<p class="article-caption">{inline(" ".join(block.splitlines()))}</p>')
+            parts.append(f'<p class="article-caption">{render_inline(" ".join(block.splitlines()))}</p>')
+        elif footnote.match(block):
+            if notes_position is None:
+                notes_position = len(parts)
+            notes.extend(numbered_article_items(block, footnote))
+        elif ordered.match(block):
+            items = "".join(f'<li value="{number}">{render_inline(item)}</li>'
+                            for number, item in numbered_article_items(block, ordered))
+            parts.append(f'<ol class="article-list">{items}</ol>')
         else:
-            parts.append(markdown_text(block, heading_level=3))
+            parts.append(markdown_text(block, heading_level=3, render_inline=render_inline))
+
+    if notes:
+        notes = [(number, render_inline(text)) for number, text in notes]
+        parts.insert(notes_position, article_footnotes(notes, references))
     return "\n".join(parts), headings, figures
+
+
+def numbered_article_items(block, pattern):
+    markers = list(pattern.finditer(block))
+    boundaries = [marker.start() for marker in markers[1:]] + [len(block)]
+    return [(int(marker[1]), " ".join(block[marker.end():end].strip().splitlines()))
+            for marker, end in zip(markers, boundaries)]
+
+
+def article_footnotes(notes, references):
+    items = []
+    for number, text in notes:
+        backlinks = "".join(
+            f' <a href="#{target}" class="note-backlink" role="doc-backlink" '
+            f'aria-label="Back to note {number}, reference {index}">↩</a>'
+            for index, target in enumerate(references.get(number, []), 1)
+        )
+        items.append(f'<li id="footnote-{number}" value="{number}" tabindex="-1">{text}{backlinks}</li>')
+    return f'<ol class="article-list article-notes">{"".join(items)}</ol>'
 
 
 def publication_metadata(paper, route, description, pdf_url):
