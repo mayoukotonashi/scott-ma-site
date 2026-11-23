@@ -31,7 +31,8 @@
     "license": {
       "label": "CC BY 4.0",
       "url": "https://creativecommons.org/licenses/by/4.0/"
-    }
+    },
+    "publicTextEdition": "version-of-record"
   },
   {
     "slug": "homi",
@@ -59,7 +60,10 @@
     ],
     "issue": "1",
     "publicationDate": "2025-01-02",
-    "doi": "10.1080/18692729.2023.2220467"
+    "doi": "10.1080/18692729.2023.2220467",
+    "publicText": "homi-version-of-record.txt",
+    "publicTextEdition": "version-of-record",
+    "publicTextLabel": "Full text"
   },
   {
     "slug": "chinatown",
@@ -85,7 +89,10 @@
     ],
     "issue": "4",
     "publicationDate": "2025-11-01",
-    "doi": "10.1215/10679847-11924334"
+    "doi": "10.1215/10679847-11924334",
+    "publicText": "chinatown-version-of-record.txt",
+    "publicTextEdition": "version-of-record",
+    "publicTextLabel": "Full text"
   },
   {
     "slug": "hamatora",
@@ -112,7 +119,10 @@
     "issue": "65",
     "publicationDate": "2024",
     "doi": "10.1353/jwj.2024.a922154",
-    "issueOnly": true
+    "issueOnly": true,
+    "publicText": "hamatora-version-of-record.txt",
+    "publicTextEdition": "version-of-record",
+    "publicTextLabel": "Full text"
   },
   {
     "slug": "port",
@@ -144,7 +154,8 @@
     "license": {
       "label": "CC BY 4.0",
       "url": "https://creativecommons.org/licenses/by/4.0/"
-    }
+    },
+    "publicTextEdition": "version-of-record"
   },
   {
     "slug": "isekai",
@@ -173,7 +184,10 @@
     ],
     "issue": "2",
     "publicationDate": "2023-09-25",
-    "doi": "10.1386/eapc_00111_1"
+    "doi": "10.1386/eapc_00111_1",
+    "publicText": "isekai-version-of-record.txt",
+    "publicTextEdition": "version-of-record",
+    "publicTextLabel": "Full text"
   },
   {
     "slug": "nagasaki",
@@ -202,7 +216,10 @@
     ],
     "issue": "2",
     "publicationDate": "2023-05-01",
-    "doi": "10.1080/13642529.2023.2206727"
+    "doi": "10.1080/13642529.2023.2206727",
+    "publicText": "nagasaki-version-of-record.txt",
+    "publicTextEdition": "version-of-record",
+    "publicTextLabel": "Full text"
   },
   {
     "slug": "japonisme",
@@ -228,6 +245,9 @@
     ],
     "issue": "1",
     "publicationDate": "2023-04",
-    "doi": "10.1163/24054992-08010001"
+    "doi": "10.1163/24054992-08010001",
+    "publicText": "japonisme-version-of-record.txt",
+    "publicTextEdition": "version-of-record",
+    "publicTextLabel": "Full text"
   }
 ]
