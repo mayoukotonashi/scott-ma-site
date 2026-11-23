@@ -3,6 +3,7 @@
 import argparse
 from html import escape
 import json
+import os
 from pathlib import Path
 import re
 import shutil
@@ -13,9 +14,14 @@ from urllib.parse import urlsplit
 PROJECT = Path(__file__).resolve().parent
 SOURCE = PROJECT / "src"
 OUTPUT = PROJECT / "dist"
+ASSETS = SOURCE / "assets"
 SITE = json.loads((SOURCE / "site.json").read_text(encoding="utf-8"))
+if deployment_url := os.environ.get("SCOTT_MA_SITE_URL"):
+    SITE["url"] = deployment_url.rstrip("/").replace("http://", "https://", 1)
 LAYOUT = Template((SOURCE / "templates/base.html").read_text(encoding="utf-8"))
 PUBLICATIONS = json.loads((SOURCE / "publications.json").read_text(encoding="utf-8"))
+GALLERY_PATH = SOURCE / "gallery.json"
+GALLERY = json.loads(GALLERY_PATH.read_text(encoding="utf-8")) if GALLERY_PATH.exists() else []
 NAVIGATION = {"": "Home", "research": "Research", "publications": "Publications", "cv": "CV"}
 
 
@@ -26,12 +32,15 @@ def inline(text):
 
 def markdown(name):
     """Render headings, lists, and paragraphs in the site's content files."""
-    content = (SOURCE / f"{name}.md").read_text(encoding="utf-8")
+    return markdown_text((SOURCE / f"{name}.md").read_text(encoding="utf-8"))
+
+
+def markdown_text(content, heading_level=2):
     parts = []
-    for block in re.split(r"\n\s*\n", content.strip()):
+    for block in filter(None, re.split(r"\n\s*\n", content.strip())):
         lines = block.splitlines()
         if block.startswith("## "):
-            parts.append(f"<h2>{inline(block[3:])}</h2>")
+            parts.append(f"<h{heading_level}>{inline(block[3:])}</h{heading_level}>")
         elif all(line.startswith("- ") for line in lines):
             items = "".join(f"<li>{inline(line[2:])}</li>" for line in lines)
             parts.append(f"<ul>{items}</ul>")
@@ -47,6 +56,28 @@ def local_url(current, target=""):
 
 def origin_url(route):
     return f"{SITE['url']}/{route + '/' if route else ''}"
+
+
+def structured_data(**fields):
+    data = {"@context": "https://schema.org", **fields}
+    encoded = json.dumps(data, ensure_ascii=False).replace("<", "\\u003c")
+    return f'<script type="application/ld+json">{encoded}</script>'
+
+
+def asset_path(name):
+    if not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9._-]*", name):
+        raise ValueError(f"Invalid asset filename: {name}")
+    path = ASSETS / name
+    if not path.is_file():
+        raise ValueError(f"Missing asset: {path}")
+    return path
+
+
+def https_url(link):
+    url = urlsplit(link)
+    if url.scheme != "https" or not url.netloc:
+        raise ValueError(f"Expected an absolute HTTPS link: {link}")
+    return escape(link)
 
 
 def write_page(route, title, description, content, active=None, extra_head="", article=False):
@@ -106,11 +137,37 @@ def page_header(heading, subtitle="", label="", back=False):
 </div></div>'''
 
 
-def prose_page(heading, body, *, subtitle="", label=""):
+def prose_page(heading, body, *, subtitle="", label="", gallery=""):
     return f'''<main id="main">
   {page_header(heading, subtitle, label)}
-  <div class="frame page-body"><div class="prose">{body}</div></div>
+  <div class="frame page-body"><div class="prose">{body}</div>{gallery}</div>
 </main>'''
+
+
+def gallery_html(location, asset_prefix):
+    figures = []
+    for image in GALLERY:
+        if image["location"] != location:
+            continue
+        asset = escape(asset_path(image["asset"]).name)
+        caption = escape(image["caption"])
+        alt = escape(image["alt"])
+        credit = escape(image["credit"])
+        source = https_url(image["source"])
+        rights = escape(image.get("licenseLabel", ""))
+        if rights and image.get("licenseUrl"):
+            rights = f'<a href="{https_url(image["licenseUrl"])}">{rights}</a>'
+        provenance = " · ".join(filter(None, (credit, f'<a href="{source}">Source</a>', rights)))
+        figures.append(f'''<figure>
+  <img src="{asset_prefix}{asset}" alt="{alt}" loading="lazy" decoding="async">
+  <figcaption>{caption}<br><small>{provenance}</small></figcaption>
+</figure>''')
+    if not figures:
+        return ""
+    return f'''<section class="field-gallery" aria-label="Historical images">
+  <h2>Historical images</h2>
+  <div class="gallery-grid">{"".join(figures)}</div>
+</section>'''
 
 
 def write_profile_pages():
@@ -119,6 +176,8 @@ def write_profile_pages():
     affiliation = escape(SITE["affiliation"])
     project = escape(SITE["researchTitle"])
     subtitle = escape(SITE["researchSubtitle"])
+    home_gallery = gallery_html("home", "./assets/")
+    home_gallery = f'<div class="frame">{home_gallery}</div>' if home_gallery else ""
     write_page("", f'{SITE["name"]} | {SITE["tagline"]}', SITE["tagline"], f'''<main id="main">
   <div class="hero"><div class="frame hero-inner">
     <div>
@@ -140,10 +199,19 @@ def write_profile_pages():
       <a href="./research/">Read about the project</a>
     </aside>
   </div>
+  {home_gallery}
 </main>''')
+    dissertation_title = SITE.get("dissertationTitle", SITE["researchTitle"])
+    dissertation_description = f"{dissertation_title}. Dissertation research by {SITE['name']}."
+    dissertation = f'<p class="dissertation-title">{escape(dissertation_title)}</p>\n<h2>Dissertation abstract</h2>\n'
+    dissertation += markdown("research")
     write_page(
-        "research", f'{SITE["researchTitle"]} | {SITE["name"]}', SITE["researchSubtitle"],
-        prose_page(SITE["researchTitle"], markdown("research"), subtitle=SITE["researchSubtitle"], label="Dissertation"),
+        "research", f'{dissertation_title} | {SITE["name"]}', dissertation_description,
+        prose_page(SITE["researchTitle"], dissertation, subtitle=SITE["researchSubtitle"], label="Dissertation",
+                   gallery=gallery_html("research", "../assets/")),
+        extra_head=structured_data(**{"@type": "WebPage", "name": dissertation_title, "url": origin_url("research"),
+                                     "description": dissertation_description,
+                                     "author": {"@type": "Person", "name": SITE["name"]}}),
     )
     cv = markdown("cv") + '\n<p>For my publication record, see <a href="../publications/">Publications</a>.</p>'
     write_page("cv", f'CV | {SITE["name"]}', "Appointments, education, fellowships, and languages.", prose_page("Curriculum Vitae", cv))
@@ -153,7 +221,21 @@ def write_profile_pages():
 
 def citation(paper, include_year=False):
     year = f' ({paper["year"]})' if include_year else ""
-    return f'<cite>{escape(paper["journal"])}</cite> {escape(paper["volume"])}{year}, {escape(paper["pages"])}.'
+    volume = "" if paper.get("issueOnly") else f' {escape(str(paper["volume"]))}'
+    number = paper_issue(paper)
+    issue = f", no. {escape(str(number))}" if number else ""
+    return f'<cite>{escape(paper["journal"])}</cite>{volume}{issue}{year}, {escape(paper["pages"])}.'
+
+
+def paper_issue(paper):
+    return paper.get("issue") or (paper["volume"] if paper.get("issueOnly") else "")
+
+
+def paper_doi(paper):
+    doi = paper.get("doi", "")
+    if not doi and paper["link"].startswith("https://doi.org/"):
+        doi = paper["link"]
+    return doi.removeprefix("https://doi.org/")
 
 
 def validated_publications():
@@ -164,9 +246,12 @@ def validated_publications():
             raise ValueError(f"Invalid or duplicate publication slug: {slug}")
         seen.add(slug)
         for link in [paper["link"], *(item["url"] for item in paper.get("links", []))]:
-            url = urlsplit(link)
-            if url.scheme != "https" or not url.netloc:
-                raise ValueError(f"Publication links must be absolute HTTPS URLs: {link}")
+            https_url(link)
+        for key in ("publicPdf", "publicText"):
+            if paper.get(key):
+                asset_path(paper[key])
+        if paper.get("license"):
+            https_url(paper["license"]["url"])
     return sorted(PUBLICATIONS, key=lambda paper: paper["year"], reverse=True)
 
 
@@ -177,12 +262,15 @@ def bibtex(paper):
         "title": "{" + paper["title"] + "}",
         "journal": paper["journal"],
         "year": paper["year"],
-        "volume": paper["volume"],
         "pages": paper["pages"].replace("–", "--"),
         "url": paper["link"],
     }
-    if paper["link"].startswith("https://doi.org/"):
-        fields["doi"] = paper["link"].removeprefix("https://doi.org/")
+    if not paper.get("issueOnly"):
+        fields["volume"] = paper["volume"]
+    if paper_issue(paper):
+        fields["number"] = paper_issue(paper)
+    if paper_doi(paper):
+        fields["doi"] = paper_doi(paper)
     key = re.sub(r"[^a-zA-Z0-9]", "", paper["authors"][0].split()[-1])
     key += str(paper["year"]) + "-" + paper["slug"].split("-")[0]
     entries = ",\n".join(f"  {field} = {{{value}}}" for field, value in fields.items())
@@ -231,36 +319,130 @@ def write_publication(paper):
     title = paper["title"]
     authors = ", ".join(paper["authors"])
     summary = paper.get("abstract", "")
-    links = [f'<a class="primary" href="{escape(paper["link"])}">Publisher page</a>']
-    links.extend(f'<a href="{escape(item["url"])}">{escape(item["label"])}</a>' for item in paper.get("links", []))
-    links.append('<a href="./citation.bib" download>BibTeX</a>')
-    meta_fields = [("citation_title", title), ("citation_journal_title", paper["journal"]),
-                   ("citation_publication_date", paper["year"]), ("citation_volume", paper["volume"])]
-    meta_fields.extend(("citation_author", author) for author in paper["authors"])
-    first_page, separator, last_page = paper["pages"].partition("–")
-    if separator:
-        meta_fields.extend([("citation_firstpage", first_page), ("citation_lastpage", last_page)])
-    if paper["link"].startswith("https://doi.org/"):
-        meta_fields.append(("citation_doi", paper["link"].removeprefix("https://doi.org/")))
-    meta = "\n  ".join(f'<meta name="{name}" content="{escape(str(value))}">' for name, value in meta_fields)
-    abstract = f'<div class="prose"><h2>Summary</h2><p>{escape(summary)}</p></div>' if summary else ""
+    hook = paper.get("hook", "")
+    description = hook or summary or f"{title}, by {authors}."
+    pdf_name = publication_pdf_name(paper)
+    pdf_url = f"{origin_url(route)}{pdf_name}" if pdf_name else ""
+    hook_html = f'<p class="article-hook">{inline(hook)}</p>' if hook else ""
+    abstract = article_section(paper.get("abstractLabel", "Summary"), markdown_text(summary, heading_level=3))
+    keywords = "".join(f"<li>{escape(keyword)}</li>" for keyword in paper.get("keywords", []))
+    keywords = article_section(paper.get("keywordsLabel", "Keywords"), f'<ul class="keywords">{keywords}</ul>') if keywords else ""
+    version_note = paper.get("publicVersionNote", "")
+    version_note = f'<p class="public-version-note">{escape(version_note)}</p>' if version_note else ""
     content = f'''<main id="main">
   {page_header(title, authors, back=True)}
   <div class="frame page-body">
     <p class="article-citation">{citation(paper, include_year=True)}</p>
-    <div class="resource-links">{"".join(links)}</div>
-    {abstract}
+    <div class="resource-links">{publication_links(paper, pdf_name)}</div>
+    <div class="prose">
+      {hook_html}
+      {abstract}
+      {keywords}
+      {version_note}
+      {publication_text(paper)}
+    </div>
   </div>
 </main>'''
-    write_page(route, f'{title} | {SITE["name"]}', summary or f"{title}, by {authors}.",
-               content, active="publications", extra_head=meta, article=True)
+    metadata = publication_metadata(paper, route, description, pdf_url)
+    write_page(route, f'{title} | {SITE["name"]}', description,
+               content, active="publications", extra_head=metadata, article=True)
     (OUTPUT / route / "citation.bib").write_text(bibtex(paper), encoding="utf-8")
+    if pdf_name:
+        shutil.copyfile(asset_path(paper["publicPdf"]), OUTPUT / route / pdf_name)
+
+
+def publication_pdf_name(paper):
+    if not paper.get("publicPdf"):
+        return ""
+    label = paper.get("publicPdfLabel", "").casefold()
+    return "accepted-manuscript.pdf" if label.startswith("accepted manuscript") else "version-of-record.pdf"
+
+
+def publication_links(paper, pdf_name):
+    primary = "" if pdf_name else ' class="primary"'
+    links = [f'<a{primary} href="{https_url(paper["link"])}">Publisher page</a>']
+    pdf_label = paper.get("publicPdfLabel", "Version of record (PDF)")
+    if pdf_name:
+        links.insert(0, f'<a class="primary" href="./{pdf_name}">{escape(pdf_label)}</a>')
+        if paper.get("license") and not paper.get("publicText"):
+            license_url = https_url(paper["license"]["url"])
+            license_label = escape(paper["license"]["label"])
+            links.append(f'<a href="{license_url}">{license_label}</a>')
+    links.extend(f'<a href="{https_url(item["url"])}">{escape(item["label"])}</a>'
+                 for item in paper.get("links", [])
+                 if not pdf_name or item["label"].casefold() != pdf_label.casefold())
+    links.append('<a href="./citation.bib" download>BibTeX</a>')
+    return "".join(links)
+
+
+def article_section(label, body):
+    return f'<section class="article-section"><h2>{escape(label)}</h2>{body}</section>' if body else ""
+
+
+def publication_text(paper):
+    if not paper.get("publicText"):
+        return ""
+    text = asset_path(paper["publicText"]).read_text(encoding="utf-8")
+    authors = escape(", ".join(paper["authors"]))
+    credit = f'<p class="full-text-credit">{authors}. {citation(paper, include_year=True)}'
+    credit += f' <a href="{https_url(paper["link"])}">Publication details at the publisher</a>.'
+    if paper.get("license"):
+        license_url = https_url(paper["license"]["url"])
+        license_label = escape(paper["license"]["label"])
+        credit += f' <a href="{license_url}">{license_label}</a>.'
+    return article_section(paper.get("publicTextLabel", "Full text"), credit + "</p>" + markdown_text(text, heading_level=3))
+
+
+def publication_metadata(paper, route, description, pdf_url):
+    published = str(paper.get("publicationDate") or paper["year"])
+    doi = paper_doi(paper)
+    title = paper["title"]
+    number = paper_issue(paper)
+    volume = None if paper.get("issueOnly") else paper["volume"]
+    meta_fields = [("citation_title", title), ("citation_journal_title", paper["journal"]),
+                   ("citation_publication_date", published.replace("-", "/"))]
+    meta_fields.extend(("citation_author", author) for author in paper["authors"])
+    page_bounds = re.split(r"\s*[–—-]\s*", paper["pages"], maxsplit=1)
+    meta_fields.append(("citation_firstpage", page_bounds[0]))
+    if len(page_bounds) == 2:
+        meta_fields.append(("citation_lastpage", page_bounds[1]))
+    optional = [("citation_volume", volume), ("citation_issue", number), ("citation_issn", paper.get("issn")),
+                ("citation_doi", doi), ("citation_pdf_url", pdf_url)]
+    meta_fields.extend((name, value) for name, value in optional if value)
+    meta = "\n  ".join(f'<meta name="{name}" content="{escape(str(value))}">' for name, value in meta_fields)
+
+    journal = {"@type": "Periodical", "name": paper["journal"]}
+    if paper.get("issn"):
+        journal["issn"] = paper["issn"]
+    collection = {"@type": "PublicationVolume", "volumeNumber": volume, "isPartOf": journal} if volume else journal
+    if number:
+        collection = {"@type": "PublicationIssue", "issueNumber": number, "isPartOf": collection}
+    article = {"@type": "ScholarlyArticle", "headline": title, "description": description,
+               "url": origin_url(route), "mainEntityOfPage": origin_url(route),
+               "sameAs": paper["link"], "author": [{"@type": "Person", "name": name} for name in paper["authors"]],
+               "datePublished": published.replace("/", "-"), "isPartOf": collection, "pagination": paper["pages"]}
+    if doi:
+        article["identifier"] = {"@type": "PropertyValue", "propertyID": "DOI", "value": doi}
+    if paper.get("keywords"):
+        article["keywords"] = paper["keywords"]
+    if paper.get("abstract") and paper.get("abstractLabel") == "Abstract":
+        article["abstract"] = paper["abstract"]
+    if pdf_url:
+        article["encoding"] = {"@type": "MediaObject", "encodingFormat": "application/pdf", "contentUrl": pdf_url,
+                               "name": paper.get("publicPdfLabel", "Version of record (PDF)")}
+    if paper.get("license"):
+        article["license"] = paper["license"]["url"]
+    return meta + "\n  " + structured_data(**article)
 
 
 def build():
     if OUTPUT.exists():
         shutil.rmtree(OUTPUT)
-    shutil.copytree(SOURCE / "assets", OUTPUT / "assets")
+    (OUTPUT / "assets").mkdir(parents=True)
+    site_assets = {"favicon.svg", "site.css", "scott-ma.webp", "publications.js"}
+    site_assets.update(image["asset"] for image in GALLERY)
+    for name in sorted(site_assets):
+        shutil.copyfile(asset_path(name), OUTPUT / "assets" / name)
     write_profile_pages()
     write_publications()
     page_aliases = {
@@ -278,6 +460,8 @@ def build():
         if alias:
             write_alias(alias, f'publications/{paper["slug"]}')
     urls = [origin_url(route) for route in [*NAVIGATION, *(f'publications/{paper["slug"]}' for paper in PUBLICATIONS)]]
+    urls.extend(f'{origin_url(f"publications/{paper["slug"]}")}{publication_pdf_name(paper)}'
+                for paper in PUBLICATIONS if publication_pdf_name(paper))
     entries = "\n".join(f"  <url><loc>{escape(url)}</loc></url>" for url in urls)
     (OUTPUT / "sitemap.xml").write_text(
         f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{entries}\n</urlset>\n',
