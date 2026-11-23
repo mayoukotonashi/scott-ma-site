@@ -1,7 +1,7 @@
 """Build the portable static website from the text and bibliography in src/."""
 
 import argparse
-from html import escape
+from html import escape, unescape
 import json
 import os
 from pathlib import Path
@@ -265,8 +265,10 @@ def validated_publications():
             legacy_seen.add(legacy)
         for link in [paper["link"], *(item["url"] for item in paper.get("links", []))]:
             https_url(link)
-        if (paper.get("publicPdf") or paper.get("publicText")) and paper.get("publicPdfLabel") != "Version of record (PDF)":
+        if paper.get("publicText") and paper.get("publicTextEdition") != "version-of-record":
             raise ValueError(f"Public full text must use the version of record: {slug}")
+        if paper.get("publicPdf") and paper.get("publicPdfLabel") != "Version of record (PDF)":
+            raise ValueError(f"Public PDF must use the version of record: {slug}")
         for key in ("publicPdf", "publicText"):
             if paper.get(key):
                 asset_path(paper[key])
@@ -512,8 +514,13 @@ def article_markdown(content):
             return (f'<a class="author-date-citation" data-reader-note="Citation" '
                     f'href="#reference-{key}">{label}</a>')
 
-        text = re.sub(r"\[([^\]\n]+)\]\((\./version-of-record\.pdf#page=\d+)\)",
-                      r'<a href="\2">\1</a>', inline(text))
+        def link_reference(match):
+            label, url = match.groups()
+            href = https_url(unescape(url)) if url.startswith("https://") else url
+            return f'<a href="{href}">{label}</a>'
+
+        text = re.sub(r"\[([^\]\n]+)\]\((https://[^\s<>()]+|\./version-of-record\.pdf#page=\d+)\)",
+                      link_reference, inline(text))
         text = author_date.sub(citation_reference, text)
         return re.sub(r"\[\^(\d+)\]", note_reference, text)
 
