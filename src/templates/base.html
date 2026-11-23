@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>$title</title>
+  <meta name="description" content="$description">
+  <link rel="canonical" href="$canonical">
+  <meta property="og:type" content="$og_type">
+  <meta property="og:title" content="$title">
+  <meta property="og:description" content="$description">
+  <meta property="og:url" content="$canonical">
+  <meta property="og:image" content="$site_url/assets/scott-ma.webp">
+  <meta name="theme-color" content="#f8f7f2">
+  <link rel="icon" href="$root/assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="$root/assets/site.css">
+  $extra_head
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="frame header-inner">
+      <a class="wordmark" href="$root/" aria-label="$name, home">$name</a>
+      <nav aria-label="Main navigation">$navigation</nav>
+      <a class="header-contact" href="mailto:$email">Email</a>
+    </div>
+  </header>
+  $content
+  <footer class="site-footer">
+    <div class="frame footer-inner">
+      <div>
+        <a class="wordmark" href="$root/">$name</a>
+        <p>$affiliation</p>
+      </div>
+      <div class="footer-links">
+        <a href="mailto:$email">$email</a>
+        <a href="$root/privacy/">Privacy</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
