@@ -119,7 +119,12 @@
     "issue": "65",
     "publicationDate": "2024",
     "doi": "10.1353/jwj.2024.a922154",
-    "issueOnly": true
+    "issueOnly": true,
+    "publicText": "western-elegance-author-preprint.txt",
+    "publicPdf": "western-elegance-author-preprint.pdf",
+    "publicTextLabel": "Full text (author preprint)",
+    "publicPdfLabel": "Preprint (PDF)",
+    "publicVersionNote": "Author’s original manuscript, October 2022. The final, peer-reviewed article was published in U.S.-Japan Women’s Journal, no. 65 (2024), pp. 25–55. https://doi.org/10.1353/jwj.2024.a922154. This copy includes the submitted text and its original figure captions."
   },
   {
     "slug": "67051-a-lesson-in-port-citizenship-regimes-of-historicity-in-maritime-museums-in-yokohama-japan-1961-2022",
@@ -179,7 +184,12 @@
     ],
     "issue": "2",
     "publicationDate": "2023-09-25",
-    "doi": "10.1386/eapc_00111_1"
+    "doi": "10.1386/eapc_00111_1",
+    "publicText": "isekai-author-preprint.txt",
+    "publicPdf": "isekai-author-preprint.pdf",
+    "publicTextLabel": "Full text (author preprint)",
+    "publicPdfLabel": "Preprint (PDF)",
+    "publicVersionNote": "This is a pre-peer-review preprint © Scott Ma 2022. The definitive, peer-reviewed and edited version is published in East Asian Journal of Popular Culture 9, no. 2 (2023), pp. 281–297, https://doi.org/10.1386/eapc_00111_1."
   },
   {
     "slug": "67054-global-history-in-two-chronotopes-time-identity-and-the-practical-past-in-nagasaki-japan-1990-and-2006",
