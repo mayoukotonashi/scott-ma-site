@@ -9,9 +9,11 @@ function initializeArticleReader(root = document) {
 }
 
 function initializeArticleNotes(article, signal) {
-  const notes = article.querySelectorAll(".note-ref a");
+  const selector = ".note-ref a, a[data-reader-note]";
+  const notes = article.querySelectorAll(selector);
   if (!notes.length) return;
 
+  const text = article.querySelector(".reader-body");
   const popover = document.createElement("div");
   popover.className = "note-popover";
   popover.id = "article-note-popover";
@@ -57,6 +59,23 @@ function initializeArticleNotes(article, signal) {
     }
 
     const margin = 12;
+    const sideMargin = 68;
+    const readingColumn = text.getBoundingClientRect();
+    const rightRoom = viewportWidth - readingColumn.right - margin - sideMargin;
+    const leftRoom = readingColumn.left - margin - sideMargin;
+    const sidebar = window.matchMedia("(min-width: 801px)").matches;
+    const rightSide = rightRoom >= 250;
+    const room = rightSide ? rightRoom : leftRoom;
+    if (sidebar && room >= 250) {
+      const width = Math.min(room, 350);
+      const left = rightSide ? readingColumn.right + margin : readingColumn.left - margin - width;
+      popover.style.width = `${width}px`;
+      popover.style.left = `${left}px`;
+      popover.style.top = `${Math.max(margin, Math.min(anchor.top, viewportHeight - popover.offsetHeight - margin))}px`;
+      return;
+    }
+
+    popover.style.width = "";
     const top = anchor.bottom + margin + popover.offsetHeight > viewportHeight - margin
       ? anchor.top - popover.offsetHeight - margin
       : anchor.bottom + margin;
@@ -66,7 +85,7 @@ function initializeArticleNotes(article, signal) {
   }
 
   article.addEventListener("click", (event) => {
-    const note = event.target.closest(".note-ref a");
+    const note = event.target.closest(selector);
     if (!note || event.defaultPrevented || event.button !== 0
         || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
     const destination = article.querySelector(note.hash + " .note-text");
@@ -81,7 +100,7 @@ function initializeArticleNotes(article, signal) {
     closeNote();
     trigger = note;
     trigger.setAttribute("aria-expanded", "true");
-    label.textContent = trigger.getAttribute("aria-label");
+    label.textContent = trigger.dataset.readerNote || trigger.getAttribute("aria-label") || "Note";
     content.replaceChildren(destination.cloneNode(true));
     popover.hidden = false;
     positionNote();
@@ -112,69 +131,63 @@ function initializeArticleEdges(article, signal) {
   const next = nav.querySelector(".article-edge-next");
   const desktop = window.matchMedia("(min-width: 801px) and (hover: hover) and (pointer: fine)");
   let pointer;
-  let pendingEdge;
-  let revealTimer;
-
-  function cueEdge(gutter, outerEdge) {
-    nav.dataset.gutter = gutter;
-    if (outerEdge === pendingEdge) return;
-    window.clearTimeout(revealTimer);
-    pendingEdge = outerEdge;
-    delete nav.dataset.ready;
-    if (outerEdge) {
-      revealTimer = window.setTimeout(() => {
-        nav.dataset.ready = outerEdge;
-      }, 170);
-    }
-  }
+  let frame = 0;
 
   function updateEdges() {
-    if (!pointer || !desktop.matches) {
-      cueEdge("", "");
+    frame = 0;
+    const bounds = layout.getBoundingClientRect();
+    const center = window.innerHeight / 2;
+    const visible = desktop.matches && bounds.top <= center && bounds.bottom >= center;
+    nav.toggleAttribute("data-visible", visible);
+    if (!visible || !pointer) {
+      delete nav.dataset.gutter;
       return;
     }
     const {x, y} = pointer;
-    const bounds = layout.getBoundingClientRect();
     const hovered = document.elementFromPoint(x, y);
     const shortcut = hovered?.closest(".article-edge");
-    if (shortcut && shortcut.rel === nav.dataset.ready) return;
-    if (y < bounds.top || y >= bounds.bottom || hovered?.closest(
+    if (!shortcut && (y < bounds.top || y >= bounds.bottom || hovered?.closest(
       "a, button, input, select, textarea, .note-popover",
-    )) {
-      cueEdge("", "");
+    ))) {
+      delete nav.dataset.gutter;
       return;
     }
 
     const articleBounds = text.getBoundingClientRect();
     const width = document.documentElement.clientWidth;
-    if (previous && x < articleBounds.left) {
+    if (previous && (shortcut?.rel === "prev" || x < articleBounds.left)) {
       nav.style.setProperty("--gutter-width", `${articleBounds.left}px`);
-      cueEdge("prev", x <= 48 ? "prev" : "");
-    } else if (next && x >= articleBounds.right) {
+      nav.dataset.gutter = "prev";
+    } else if (next && (shortcut?.rel === "next" || x >= articleBounds.right)) {
       nav.style.setProperty("--gutter-width", `${width - articleBounds.right}px`);
-      cueEdge("next", x >= width - 48 ? "next" : "");
+      nav.dataset.gutter = "next";
     } else {
-      cueEdge("", "");
+      delete nav.dataset.gutter;
     }
+  }
+
+  function scheduleUpdate() {
+    if (!frame) frame = window.requestAnimationFrame(updateEdges);
   }
 
   function resetEdges() {
     pointer = undefined;
-    cueEdge("", "");
+    delete nav.dataset.gutter;
   }
 
   document.addEventListener("pointermove", (event) => {
     if (event.pointerType !== "mouse") return;
     pointer = {x: event.clientX, y: event.clientY};
-    updateEdges();
+    scheduleUpdate();
   }, {passive: true, signal});
   document.addEventListener("pointerout", (event) => {
     if (!event.relatedTarget) resetEdges();
   }, {passive: true, signal});
   window.addEventListener("blur", resetEdges, {signal});
-  window.addEventListener("resize", updateEdges, {signal});
-  window.addEventListener("scroll", updateEdges, {passive: true, signal});
-  signal.addEventListener("abort", resetEdges, {once: true});
+  window.addEventListener("resize", scheduleUpdate, {signal});
+  window.addEventListener("scroll", scheduleUpdate, {passive: true, signal});
+  signal.addEventListener("abort", () => window.cancelAnimationFrame(frame), {once: true});
+  updateEdges();
 }
 
 initializeArticleReader();
