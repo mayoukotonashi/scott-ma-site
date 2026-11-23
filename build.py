@@ -269,7 +269,7 @@ def validated_publications():
             raise ValueError(f"Public full text must use the version of record: {slug}")
         if paper.get("publicPdf") and paper.get("publicPdfLabel") != "Version of record (PDF)":
             raise ValueError(f"Public PDF must use the version of record: {slug}")
-        for key in ("publicPdf", "publicText"):
+        for key in ("publicPdf", "publicText", "readingPdf"):
             if paper.get(key):
                 asset_path(paper[key])
         if paper.get("license"):
@@ -382,13 +382,13 @@ def write_publication(paper, previous, following):
   </div>
   <div class="frame">{article_neighbors(previous, following)}</div>
 </main>
-<script src="../../assets/article-reader.js?v=5" defer></script>'''
+<script src="../../assets/article-reader.js?v=6" defer></script>'''
     metadata = publication_metadata(paper, route, description, record_pdf_url)
     write_page(route, f'{title} | {SITE["name"]}', description,
                content, active="publications", extra_head=metadata, article=True)
     (OUTPUT / route / "citation.bib").write_text(bibtex(paper), encoding="utf-8")
     if pdf_name:
-        shutil.copyfile(asset_path(paper["publicPdf"]), OUTPUT / route / pdf_name)
+        shutil.copyfile(asset_path(paper.get("publicPdf") or paper["readingPdf"]), OUTPUT / route / pdf_name)
     for figure in figures:
         shutil.copyfile(asset_path(figure), OUTPUT / "assets" / figure)
 
@@ -438,14 +438,17 @@ def article_neighbors(previous, following, edge=False):
 
 
 def publication_pdf_name(paper):
-    return "version-of-record.pdf" if paper.get("publicPdf") else ""
+    if paper.get("publicPdf"):
+        return "version-of-record.pdf"
+    return "reading-edition.pdf" if paper.get("readingPdf") else ""
 
 
 def publication_links(paper, pdf_name):
     links = [f'<a class="primary" href="{https_url(paper["link"])}">Publisher version of record</a>']
-    pdf_label = paper.get("publicPdfLabel", "Version of record (PDF)")
+    pdf_label = paper.get("publicPdfLabel", "Download reading PDF")
     if pdf_name:
-        links.append(f'<a href="./{pdf_name}">{escape(pdf_label)}</a>')
+        download = ' download' if pdf_name == "reading-edition.pdf" else ""
+        links.append(f'<a href="./{pdf_name}"{download}>{escape(pdf_label)}</a>')
         if paper.get("license") and not paper.get("publicText"):
             license_url = https_url(paper["license"]["url"])
             license_label = escape(paper["license"]["label"])
@@ -668,7 +671,7 @@ def build():
     for old, new in site_aliases().items():
         write_alias(old, new)
         if old.startswith("publications/"):
-            for filename in ("citation.bib", "version-of-record.pdf"):
+            for filename in ("citation.bib", "version-of-record.pdf", "reading-edition.pdf"):
                 source = OUTPUT / new / filename
                 if source.is_file():
                     shutil.copyfile(source, OUTPUT / old / filename)

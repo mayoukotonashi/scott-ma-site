@@ -97,10 +97,12 @@ function initializeArticleNotes(article, signal) {
       return;
     }
 
-    closeNote();
-    trigger = note;
-    trigger.setAttribute("aria-expanded", "true");
-    label.textContent = trigger.dataset.readerNote || trigger.getAttribute("aria-label") || "Note";
+    if (!popover.contains(note)) {
+      closeNote();
+      trigger = note;
+      trigger.setAttribute("aria-expanded", "true");
+    }
+    label.textContent = note.dataset.readerNote || note.getAttribute("aria-label") || "Note";
     content.replaceChildren(destination.cloneNode(true));
     popover.hidden = false;
     positionNote();
