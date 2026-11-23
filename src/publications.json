@@ -1,6 +1,7 @@
 [
   {
-    "slug": "67047-japanese-web-novels-media-history-platform-and-narrative",
+    "slug": "webnovels",
+    "legacySlug": "67047-japanese-web-novels-media-history-platform-and-narrative",
     "title": "Japanese Web Novels: Media History, Platform, and Narrative",
     "authors": [
       "Ichishi Iida",
@@ -25,16 +26,16 @@
     "publicationDate": "2025",
     "publicPdf": "web-novels-version-of-record.pdf",
     "publicText": "web-novels-full-text.txt",
-    "publicTextLabel": "Read full text",
+    "publicTextLabel": "Full text",
     "publicPdfLabel": "Version of record (PDF)",
     "license": {
       "label": "CC BY 4.0",
       "url": "https://creativecommons.org/licenses/by/4.0/"
-    },
-    "publicVersionNote": "The PDF contains the published article with personalized download stamps removed. The HTML text has been reformatted for reading on the web."
+    }
   },
   {
-    "slug": "67048-multiculturalism-between-ideology-and-practice-immigrant-self-narrations-of-community-activism-in-toyota-japan",
+    "slug": "homi",
+    "legacySlug": "67048-multiculturalism-between-ideology-and-practice-immigrant-self-narrations-of-community-activism-in-toyota-japan",
     "title": "Multiculturalism between Ideology and Practice: Immigrant Self-Narrations of Community Activism in Toyota, Japan",
     "authors": [
       "Scott Ma",
@@ -61,7 +62,8 @@
     "doi": "10.1080/18692729.2023.2220467"
   },
   {
-    "slug": "67046-the-limits-of-humanism-on-the-discursive-construction-of-the-japanese-chinatown",
+    "slug": "chinatown",
+    "legacySlug": "67046-the-limits-of-humanism-on-the-discursive-construction-of-the-japanese-chinatown",
     "title": "The Limits of Humanism: On the Discursive Construction of the Japanese “Chinatown”",
     "authors": [
       "Scott Ma"
@@ -86,7 +88,8 @@
     "doi": "10.1215/10679847-11924334"
   },
   {
-    "slug": "67050-western-elegance-yokohama-style-college-fashion-urban-redevelopment-and-the-rise-of-feminine-motomachi-in-post-1970-japan",
+    "slug": "hamatora",
+    "legacySlug": "67050-western-elegance-yokohama-style-college-fashion-urban-redevelopment-and-the-rise-of-feminine-motomachi-in-post-1970-japan",
     "title": "Western Elegance, Yokohama Style: College Fashion, Urban Redevelopment, and the Rise of Feminine Motomachi in Post-1970 Japan",
     "authors": [
       "Scott Ma"
@@ -112,7 +115,8 @@
     "issueOnly": true
   },
   {
-    "slug": "67051-a-lesson-in-port-citizenship-regimes-of-historicity-in-maritime-museums-in-yokohama-japan-1961-2022",
+    "slug": "port",
+    "legacySlug": "67051-a-lesson-in-port-citizenship-regimes-of-historicity-in-maritime-museums-in-yokohama-japan-1961-2022",
     "title": "A Lesson in Port Citizenship: Regimes of Historicity in Maritime Museums in Yokohama, Japan, 1961–2022",
     "authors": [
       "Scott Ma"
@@ -135,16 +139,16 @@
     "doi": "10.15848/hh.v16i41.2091",
     "publicPdf": "port-citizenship-version-of-record.pdf",
     "publicText": "port-citizenship-full-text.txt",
-    "publicTextLabel": "Read full text",
+    "publicTextLabel": "Full text",
     "publicPdfLabel": "Version of record (PDF)",
     "license": {
       "label": "CC BY 4.0",
       "url": "https://creativecommons.org/licenses/by/4.0/"
-    },
-    "publicVersionNote": "The PDF is the publisher’s version of record. The HTML text has been reformatted for reading on the web."
+    }
   },
   {
-    "slug": "67052-fantasies-of-europe-fantasies-of-japan-isekai-and-the-narrative-logic-of-japanese-occidentalism",
+    "slug": "isekai",
+    "legacySlug": "67052-fantasies-of-europe-fantasies-of-japan-isekai-and-the-narrative-logic-of-japanese-occidentalism",
     "title": "Fantasies of Europe, Fantasies of Japan: Isekai and the Narrative Logic of Japanese Occidentalism",
     "authors": [
       "Scott Ma"
@@ -172,7 +176,8 @@
     "doi": "10.1386/eapc_00111_1"
   },
   {
-    "slug": "67054-global-history-in-two-chronotopes-time-identity-and-the-practical-past-in-nagasaki-japan-1990-and-2006",
+    "slug": "nagasaki",
+    "legacySlug": "67054-global-history-in-two-chronotopes-time-identity-and-the-practical-past-in-nagasaki-japan-1990-and-2006",
     "title": "Global History in Two Chronotopes: Time, Identity, and the Practical Past in Nagasaki, Japan, 1990 and 2006",
     "authors": [
       "Scott Ma"
@@ -200,7 +205,8 @@
     "doi": "10.1080/13642529.2023.2206727"
   },
   {
-    "slug": "67055-the-politics-of-curating-japonisme-international-art-exhibition-and-soft-power-in-contemporary-japanese-cultural-diplomacy",
+    "slug": "japonisme",
+    "legacySlug": "67055-the-politics-of-curating-japonisme-international-art-exhibition-and-soft-power-in-contemporary-japanese-cultural-diplomacy",
     "title": "The Politics of Curating Japonisme: International Art Exhibition and Soft Power in Contemporary Japanese Cultural Diplomacy",
     "authors": [
       "Scott Ma"
