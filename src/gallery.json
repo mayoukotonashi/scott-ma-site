@@ -1,0 +1,42 @@
+[
+  {
+    "asset": "rice-fields-sarashina.webp",
+    "alt": "Color woodblock print of moonlit rice terraces and mountains in Sarashina",
+    "caption": "Utagawa Hiroshige (歌川広重), Reflections of the Moon in the Rice Fields of Sarashina in Shinshu (信州更科田毎之月), ca. 1832.",
+    "credit": "The Metropolitan Museum of Art, JP1880. H. O. Havemeyer Collection, Bequest of Mrs. H. O. Havemeyer, 1929.",
+    "source": "https://www.metmuseum.org/art/collection/search/44980",
+    "licenseLabel": "Public domain",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "location": "home"
+  },
+  {
+    "asset": "agriculture-and-sericulture.webp",
+    "alt": "Hand-colored Chinese woodblock illustration of agricultural work with a poem above the scene",
+    "caption": "Agricultural work illustrated in the Imperially Commissioned Illustrations of Agriculture and Sericulture (御製耕織圖), 1696.",
+    "credit": "Cut by Zhu Gui (朱圭) after designs by Jiao Bingzhen (焦秉貞). Chester Beatty, Dublin, C 1717.1.",
+    "source": "https://viewer.cbl.ie/viewer/image/C_1717_1/6/LOG_0002/",
+    "licenseLabel": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "location": "research"
+  },
+  {
+    "asset": "sapporo-agricultural-college.webp",
+    "alt": "Black-and-white photograph of Sapporo Agricultural College buildings",
+    "caption": "Sapporo Agricultural College (札幌農学校), 1880. The photograph shows part of the early campus, including its dormitory and lecture halls.",
+    "credit": "Reproduced in Masao Sekine (関根正雄), Uchimura Kanzō (内村鑑三), Shimizu Shoin (清水書院), 1967. Via Wikimedia Commons.",
+    "source": "https://commons.wikimedia.org/wiki/File:Sapporo_Agricultural_School_in1880.jpg",
+    "licenseLabel": "Public domain",
+    "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+    "location": "research"
+  },
+  {
+    "asset": "taiwan-rice-harvest.webp",
+    "alt": "Black-and-white photograph of people harvesting rice in a field in Taiwan",
+    "caption": "Rice harvesting in Taiwan (臺灣), published in a 1912 statistical survey.",
+    "credit": "Photographer unrecorded. Government-General of Taiwan (臺灣總督府), Taiwan Statistical Overview (臺灣統計要覽), 1912. Via Wikimedia Commons.",
+    "source": "https://commons.wikimedia.org/wiki/File:Rice_harvesting_in_Taiwan.jpg",
+    "licenseLabel": "Public domain",
+    "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+    "location": "research"
+  }
+]

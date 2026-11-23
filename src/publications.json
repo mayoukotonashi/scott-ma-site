@@ -11,13 +11,27 @@
     "year": 2025,
     "pages": "150–167",
     "link": "https://muse.jhu.edu/article/960865",
-    "abstract": "Japanese web novels grew into a major segment of the literary market through platforms that judge work by audience response. This article traces the medium’s history, explains the economics of online publishing, and uses isekai (異世界) to show how fiction on these platforms can combine original storytelling with familiar narrative conventions. It closes by situating the Japanese case alongside other East Asian web-novel industries.",
-    "links": [
-      {
-        "label": "PDF",
-        "url": "https://static1.squarespace.com/static/6497b82ac1b2fa02e60022ac/t/684c40b26014ce27f7589957/1749827764321/webnovels-vor.pdf"
-      }
-    ]
+    "abstract": "This article studies the Japanese web novel, which, despite having come to represent a substantial segment of the Japanese market for literature over the course of two decades, remains almost unstudied in English-language academia. To analyze their case, the authors examine in turn the media history of Japanese web novels, the online platforms on which they are written, and the aesthetic elements of its storyworld. The article also closely examines the economic rationale underlying its success within the current Japanese culture industry, allowing a distinction between the auteurist, qualitative judgment characteristic of traditional popular literature and the audience-driven, quantitative judgment characteristic of industry trends following the ascendence of the web novel. It additionally introduces the concept of 1.5-ji sōsaku (1.5次創作) or “semi-original works” to describe how web novels exist between being original and derivative, and studies the history of the isekai (“other world”) genre as an example. Last, the article notes the similarities between the Japanese model and other models of web novel platforms in East Asia, calling for greater comparisons and theoretical exegeses of these cases.",
+    "hook": "Japanese web novels grew into a major segment of the literary market through platforms that judge work by audience response. This article traces the medium’s history, explains the economics of online publishing, and uses isekai (異世界) to show how fiction on these platforms can combine original storytelling with familiar narrative conventions. It closes by situating the Japanese case alongside other East Asian web-novel industries.",
+    "abstractLabel": "Abstract",
+    "keywords": [
+      "web novel",
+      "anime",
+      "media platform",
+      "transmedia",
+      "isekai (異世界)"
+    ],
+    "issue": "2",
+    "publicationDate": "2025",
+    "publicPdf": "web-novels-version-of-record.pdf",
+    "publicText": "web-novels-full-text.txt",
+    "publicTextLabel": "Read full text",
+    "publicPdfLabel": "Version of record (PDF)",
+    "license": {
+      "label": "CC BY 4.0",
+      "url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "publicVersionNote": "The PDF contains the published article with personalized download stamps removed. The HTML text has been reformatted for reading on the web."
   },
   {
     "slug": "67048-multiculturalism-between-ideology-and-practice-immigrant-self-narrations-of-community-activism-in-toyota-japan",
@@ -31,17 +45,29 @@
     "year": 2025,
     "pages": "88–109",
     "link": "https://doi.org/10.1080/18692729.2023.2220467",
-    "abstract": "Drawing on life-history interviews with three Brazilian community activists in Homi Danchi (保見団地), the article examines how Japan’s official language of multicultural coexistence (多文化共生) takes on meaning in local practice. The activists use that language to build a community around shared work, even as their organizing leaves some residents outside it. The analysis uses Pierre Bourdieu to connect the way people narrate their lives with the way they experience belonging.",
-    "links": [
-      {
-        "label": "Accepted manuscript (PDF)",
-        "url": "https://static1.squarespace.com/static/6497b82ac1b2fa02e60022ac/t/64a85eab7cde9a2d491a8b29/1688755884046/Homi%2B-%2BAM.pdf"
-      }
-    ]
+    "abstract": "From 1990, a revised immigration law offered foreigners of Japanese descent (nikkei) the right to work for unlimited duration in Japan. Many nikkei came from Latin America to take on blue-collar jobs in the country’s factories. Homi Danchi, a working-class housing complex in Toyota, Japan, has since become known for its Brazilian immigrant community. Drawing on in-depth interviews, this study analyzes the self-narrated biographies of three Brazilian immigrants who actively participate in community activism in Homi. Applying Pierre Bourdieu’s theory of practice and his critique of the “biographical illusion,” this article examines how the abstract ideology of Japanese-style multiculturalism (tabunka kyōsei) is understood and practiced at a local level. It argues that our narrators’ practical desires to recreate multicultural community in Homi reapply abstract multicultural values to a local context, thereby implicitly acknowledging multiculturalism’s symbolic capital and limiting the extent of activism to Homi. Applying the symbolic capital of multiculturalism to everyday practice, in turn, makes activism meaningful and imagines a community of fellow actors, albeit to the exclusion of outsiders. Multiculturalism thereby becomes a question not primarily of coexistence, but of community-building. We also underline the role that narration of one’s own history plays in mediating between individual experience and community belonging, contributing to methodological debates about Bourdieu’s biographical method.",
+    "hook": "Drawing on life-history interviews with three Brazilian community activists in Homi Danchi (保見団地), the article examines how Japan’s official language of multicultural coexistence (多文化共生) takes on meaning in local practice. The activists use that language to build a community around shared work, even as their organizing leaves some residents outside it. The analysis uses Pierre Bourdieu to connect the way people narrate their lives with the way they experience belonging.",
+    "abstractLabel": "Abstract",
+    "keywords": [
+      "Bourdieu",
+      "multiculturalism",
+      "local identity",
+      "activism",
+      "immigration",
+      "nikkei (日系)"
+    ],
+    "issue": "1",
+    "publicationDate": "2025-01-02",
+    "doi": "10.1080/18692729.2023.2220467",
+    "publicPdf": "multiculturalism-accepted-manuscript.pdf",
+    "publicText": "multiculturalism-accepted-manuscript.txt",
+    "publicTextLabel": "Read accepted manuscript",
+    "publicPdfLabel": "Accepted manuscript (PDF)",
+    "publicVersionNote": "This is an Accepted Manuscript of an article published by Taylor & Francis in Contemporary Japan on June 5, 2023, available online at https://doi.org/10.1080/18692729.2023.2220467."
   },
   {
     "slug": "67046-the-limits-of-humanism-on-the-discursive-construction-of-the-japanese-chinatown",
-    "title": "The Limits of Humanism: On the Discursive Construction of the Japanese Chinatown",
+    "title": "The Limits of Humanism: On the Discursive Construction of the Japanese “Chinatown”",
     "authors": [
       "Scott Ma"
     ],
@@ -50,13 +76,24 @@
     "year": 2025,
     "pages": "815–840",
     "link": "https://doi.org/10.1215/10679847-11924334",
-    "abstract": "This article uses Jacques Lacan’s theory of discourse to examine how activists and scholars describe Japanese Chinatowns. It compares calls to recognize a distinct community with scholarly efforts to judge the authenticity of Chinatowns. Through the case of Yokohama (横浜), it asks how these accounts relate to the neighborhood’s development as a tourist destination and to the economic interests invested in its image.",
-    "links": [
-      {
-        "label": "Accepted manuscript (PDF)",
-        "url": "https://static1.squarespace.com/static/6497b82ac1b2fa02e60022ac/t/67d67e28597da62fe62b3bf7/1742110248917/Chinatown%2B-%2BAM.pdf"
-      }
-    ]
+    "abstract": "The contemporary discourse surrounding the Japanese “Chinatown” relies on the “antinomy of Chinese humanity.” This antinomy holds together two individually reasonable statements: first, that a Chinatown houses Chinese inhabitants, and second, that no essential characteristic of Chinese people or Chinatowns exists. Interpreting Jacques Lacan’s theory of discourse, the article distinguishes two main sub-discourses that revolve around this antinomy in different ways. Whereas the activist discourse identifies with this Chinese community and argues that the Japanese public should recognize its difference, the academic discourse views Chinatowns from above to categorize them on the basis of their supposed authenticity. Using concrete examples of these discourses, this article performs close readings of the works of two influential actors in the construction of Chinatown: Yokohama Chinatown leader Hayashi Kensei, and cultural geographer Yamashita Kiyomi, respectively. The article specifically notes the operation of enjoyment in the repetition of their discourses and the implicit economic complicity in their explicitly cultural or scholastic speech. It also compares these thinkers with other influential participants in the discourse and contextualizes them within the history of Chinatown’s postwar touristification. A psychoanalytic critique of Chinatown allows us to recognize the limits of humanistic ideologies and imagine new modes of seeing Chinatown.",
+    "hook": "This article uses Jacques Lacan’s theory of discourse to examine how activists and scholars describe Japanese Chinatowns. It compares calls to recognize a distinct community with scholarly efforts to judge the authenticity of Chinatowns. Through the case of Yokohama (横浜), it asks how these accounts relate to the neighborhood’s development as a tourist destination and to the economic interests invested in its image.",
+    "abstractLabel": "Abstract",
+    "keywords": [
+      "psychoanalysis",
+      "capitalism",
+      "discourse analysis",
+      "overseas Chinese",
+      "race"
+    ],
+    "issue": "4",
+    "publicationDate": "2025-11-01",
+    "doi": "10.1215/10679847-11924334",
+    "publicPdf": "chinatown-accepted-manuscript.pdf",
+    "publicText": "chinatown-accepted-manuscript.txt",
+    "publicTextLabel": "Read accepted manuscript",
+    "publicPdfLabel": "Accepted manuscript (PDF)",
+    "publicVersionNote": "Author’s accepted manuscript. Published version © 2025 Duke University Press. The published article in positions: asia critique is available at https://doi.org/10.1215/10679847-11924334."
   },
   {
     "slug": "67050-western-elegance-yokohama-style-college-fashion-urban-redevelopment-and-the-rise-of-feminine-motomachi-in-post-1970-japan",
@@ -69,13 +106,20 @@
     "year": 2024,
     "pages": "25–55",
     "link": "https://doi.org/10.1353/jwj.2024.a922154",
-    "abstract": "This history of Yokohama’s Motomachi (横浜元町) shopping street follows young women readers of fashion magazines, city planners, and local merchants from the late 1970s. It traces how their interests converged in Hamatora (ハマトラ) fashion and in a redevelopment program that made heritage commercially valuable. Reading fashion and architecture alongside planning records, the article recovers the gendered politics of local history and neoliberal urban change.",
-    "links": [
-      {
-        "label": "PDF",
-        "url": "https://static1.squarespace.com/static/6497b82ac1b2fa02e60022ac/t/65f4afca592866377a0ccde5/1710534608580/Hamatora%2B-%2BVoR.pdf"
-      }
-    ]
+    "abstract": "Motomachi, a small shopping street on the outskirts of Yokohama’s old town, is architecturally designed with a European aesthetic and caters primarily to a clientele of women in their early twenties. This article traces the history of Motomachi’s construction as a site for feminine consumption. It identifies its origins in the late 1970s with three principal actors: the readers of a new genre of magazines targeting young and highly-educated women; economic planners in Yokohama concerned with preserving the traditional civic functions of shopping streets; and the businessmen in Motomachi’s shopping street association interested in remaining economically competitive. Through the pages of the magazine JJ, young women discovered in Motomachi traditional Japanese craftsmanship and “Yokohama traditional” (Hamatra) style. Concurrently, city bureaucrats encouraged Motomachi and other shopping streets to revitalize themselves by capitalizing on their heritage, prompting Motomachi’s savvy businessmen to project this demographic’s fantasies onto urban space. Through archival study of planning documents and fashion magazines combined with aesthetic analyses of Hamatra fashion and Motomachi’s architecture, this article shows how urban space can be impregnated with particular gendered and subcultural forms. It also interrogates the political, economic, and gendered origins of local history and how Occidentalism persists despite a discursive rejection of Western norms in favor of Japanese tradition. Lastly, the article argues that Motomachi’s history is also one of the development of neoliberalism in contemporary Japan, and that future research ought not to overlook neoliberalism’s gendered aspects.",
+    "hook": "This history of Yokohama’s Motomachi (横浜元町) shopping street follows young women readers of fashion magazines, city planners, and local merchants from the late 1970s. It traces how their interests converged in Hamatora (ハマトラ) fashion and in a redevelopment program that made heritage commercially valuable. Reading fashion and architecture alongside planning records, the article recovers the gendered politics of local history and neoliberal urban change.",
+    "abstractLabel": "Abstract",
+    "keywords": [
+      "subculture",
+      "machizukuri (まちづくり)",
+      "neoliberalism",
+      "women’s liberation",
+      "Yokohama (横浜)"
+    ],
+    "issue": "65",
+    "publicationDate": "2024",
+    "doi": "10.1353/jwj.2024.a922154",
+    "issueOnly": true
   },
   {
     "slug": "67051-a-lesson-in-port-citizenship-regimes-of-historicity-in-maritime-museums-in-yokohama-japan-1961-2022",
@@ -88,13 +132,26 @@
     "year": 2023,
     "pages": "1–29",
     "link": "https://doi.org/10.15848/hh.v16i41.2091",
-    "abstract": "Three successive maritime museums communicated changing ideas of civic identity in postwar Yokohama (横浜). Through exhibitions, museum architecture, and fieldwork, this article traces their movement from an emphasis on universal science to romantic visions of the future and then to nostalgia. François Hartog’s concept of regimes of historicity helps explain what those different ways of organizing time meant for local identity.",
-    "links": [
-      {
-        "label": "PDF",
-        "url": "https://historiadahistoriografia.com.br/revista/article/download/2091/1058/9517"
-      }
-    ]
+    "abstract": "This article applies the framework of François Hartog’s regime of historicity to a comparative and historical study of three successive maritime museums in postwar Yokohama, Japan. Each museum was operated by the city to educate its citizens about Yokohama’s maritime identity, though through different affectively-laced temporal organizations that reflected evolving conceptions of municipal identity. The article distinguishes between “scientific universalism” in the Marine Science Museum (1961-1988), “romantic futurism” at the Maritime Museum (1989-2009), and “nostalgic presentism” at the Port Museum (2009-). As evidence of each historical regime, the article uses the form and content of exhibits, architectural changes to the museum building, and fieldwork when possible. Over the course of time, the spirit of the museum shifted from the natural sciences to romanticism and, lastly, nostalgia. These museums show how temporality-infused historiography has implications for the politics of identity.",
+    "hook": "Three successive maritime museums communicated changing ideas of civic identity in postwar Yokohama (横浜). Through exhibitions, museum architecture, and fieldwork, this article traces their movement from an emphasis on universal science to romantic visions of the future and then to nostalgia. François Hartog’s concept of regimes of historicity helps explain what those different ways of organizing time meant for local identity.",
+    "abstractLabel": "Abstract",
+    "keywords": [
+      "Presentism",
+      "Public History",
+      "Collective Memory"
+    ],
+    "issue": "41",
+    "publicationDate": "2023-12-26",
+    "doi": "10.15848/hh.v16i41.2091",
+    "publicPdf": "port-citizenship-version-of-record.pdf",
+    "publicText": "port-citizenship-full-text.txt",
+    "publicTextLabel": "Read full text",
+    "publicPdfLabel": "Version of record (PDF)",
+    "license": {
+      "label": "CC BY 4.0",
+      "url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "publicVersionNote": "The PDF is the publisher’s version of record. The HTML text has been reformatted for reading on the web."
   },
   {
     "slug": "67052-fantasies-of-europe-fantasies-of-japan-isekai-and-the-narrative-logic-of-japanese-occidentalism",
@@ -107,13 +164,22 @@
     "year": 2023,
     "pages": "281–297",
     "link": "https://doi.org/10.1386/eapc_00111_1",
-    "abstract": "In popular isekai (異世界) fiction, a Japanese protagonist enters a world imagined as medieval Europe and uses new powers to reshape it. Through close readings of The Familiar of Zero (ゼロの使い魔) and Re:Zero (Re:ゼロから始める異世界生活), this article shows how such stories construct Europe as backward while imagining a Japan entitled to bring modernity back to the West.",
-    "links": [
-      {
-        "label": "Accepted manuscript (PDF)",
-        "url": "https://static1.squarespace.com/static/6497b82ac1b2fa02e60022ac/t/64a85ee9718cfb6a7a7b2945/1688755945963/Isekai%2B-%2BAM.pdf"
-      }
-    ]
+    "abstract": "This article uses the framework of literary Occidentalism to study how an unequal power relationship is staged between Japan and Europe within isekai, a popular genre of contemporary Japanese fiction. Within the standard isekai plot, a teenage Japanese boy is suddenly transferred into a fantasy version of medieval Europe. There, the protagonist is bestowed superpowers that let him exert great agency over this second world, where he embarks on an exciting adventure and generally acts as he pleases. This superpower mediates and assures the protagonist’s introduction of western modernity, under the mantle of Japanese custom, back to the West. By negating medieval Europe, ‘Japan’ thereby becomes its own fantasy, a site at once more modern than the West and yet identifiably Japanese. Engaging in close readings of two key isekai light novels, Yamaguchi Noboru’s The Familiar of Zero and Nagatsuki Tappei’s Re:Zero: Starting Life in Another World, this article specifies and identifies common narrative tropes within isekai such as an identification with Japan, a dismissal of Europe as irrational and misguided, a moralized rescue of Europeans with the protagonist’s superpower, and a dismissal of potential counterarguments to the protagonist’s moral presumptions.",
+    "hook": "In popular isekai (異世界) fiction, a Japanese protagonist enters a world imagined as medieval Europe and uses new powers to reshape it. Through close readings of The Familiar of Zero (ゼロの使い魔) and Re:Zero (Re:ゼロから始める異世界生活), this article shows how such stories construct Europe as backward while imagining a Japan entitled to bring modernity back to the West.",
+    "abstractLabel": "Abstract",
+    "keywords": [
+      "Orientalism",
+      "anime",
+      "human rights",
+      "medievalism",
+      "modernity",
+      "popular culture",
+      "nationalism",
+      "light novel"
+    ],
+    "issue": "2",
+    "publicationDate": "2023-09-25",
+    "doi": "10.1386/eapc_00111_1"
   },
   {
     "slug": "67054-global-history-in-two-chronotopes-time-identity-and-the-practical-past-in-nagasaki-japan-1990-and-2006",
@@ -126,13 +192,27 @@
     "year": 2023,
     "pages": "312–339",
     "link": "https://doi.org/10.1080/13642529.2023.2206727",
-    "abstract": "Nagasaki (長崎) drew on its history as a maritime trading hub in two expositions held in 1990 and 2006. The first staged a journey across distinct past and future zones, while the second took visitors on walks through the city’s living heritage. The article compares those ways of organizing space and time to show how communities use and contest the past amid economic change.",
-    "links": [
-      {
-        "label": "PDF",
-        "url": "https://static1.squarespace.com/static/6497b82ac1b2fa02e60022ac/t/652c107739bab0386fadc103/1697386624843/GH%2Bin%2Btwo%2Bchronotopes%2B-%2BVOR.pdf"
-      }
-    ]
+    "abstract": "This article compares two recent expositions held in Nagasaki, Japan, in 1990 and 2006. Both expositions responded to structural economic changes related to deindustrialization that prompted reidentifications with the city’s history as a maritime trade hub in early modern Japan. To compare two temporally laced identities that emerged from this turning point, I distinguish each exposition’s dominant chronotope. The 1990 Journey Exposition is characterized by Tabi (Journey)-time, which departs from a distant past to transit through a disappearing present towards a utopian future where Nagasaki has once again become an international port. The 2006 Saruku Expo is characterized by Saruku (Strolling)-time, which introspectively rediscovers Nagasaki’s local heritage within the present while imagining a changeless future, erasing the temporal divisions formative of Tabi-time. If Tabi-time is national time derived from national expositions, Saruku-time is local time derived from heritage and memory. These chronotopes are characterized by different arrangements of exposition grounds and different mobilities that visitors were expected to perform on their fairgrounds. The Journey Exposition spatially delineated Nagasaki into future and past zones, whereas the Saruku Expo featured a series of wandering strolls that drew no clear temporal boundaries. Visitors in Tabi-time engaged in epic, romantic voyages across national borders, whereas visitors in Saruku-time displaced themselves locally in an inquisitive, slow-paced manner. The article draws from exposition documents like guides and official records as well as a local town magazine to argue that the formal organization of time can be practically utilized for economic and identity-building purposes as well as politically contested between different parties. It also develops recent scholarship in Theory of History such as Hayden White’s concept of the ‘practical past’ and recent theorizations on the disorder of postmodern time.",
+    "hook": "Nagasaki (長崎) drew on its history as a maritime trading hub in two expositions held in 1990 and 2006. The first staged a journey across distinct past and future zones, while the second took visitors on walks through the city’s living heritage. The article compares those ways of organizing space and time to show how communities use and contest the past amid economic change.",
+    "abstractLabel": "Abstract",
+    "keywords": [
+      "practical past",
+      "Hayden White",
+      "global history",
+      "heritage",
+      "Japan",
+      "chronotope",
+      "time",
+      "identity"
+    ],
+    "issue": "2",
+    "publicationDate": "2023-05-01",
+    "doi": "10.1080/13642529.2023.2206727",
+    "publicPdf": "global-history-accepted-manuscript.pdf",
+    "publicText": "global-history-accepted-manuscript.txt",
+    "publicTextLabel": "Read accepted manuscript",
+    "publicPdfLabel": "Accepted manuscript (PDF)",
+    "publicVersionNote": "This is an Accepted Manuscript of an article published by Taylor & Francis in Rethinking History on May 1, 2023, available online at https://doi.org/10.1080/13642529.2023.2206727."
   },
   {
     "slug": "67055-the-politics-of-curating-japonisme-international-art-exhibition-and-soft-power-in-contemporary-japanese-cultural-diplomacy",
@@ -145,12 +225,23 @@
     "year": 2023,
     "pages": "31–66",
     "link": "https://doi.org/10.1163/24054992-08010001",
-    "abstract": "The Japanese government organized Japonismes 2018 in Paris to introduce audiences to Japanese culture. This article traces the event’s planning and curation, asking how exhibitions linked prehistoric pottery to contemporary comics and animation through the idea of a timeless Japanese aesthetic. It shows how Japanese cultural diplomacy adapted older Western ideas about Japan to serve economic and political ends.",
-    "links": [
-      {
-        "label": "Accepted manuscript (PDF)",
-        "url": "https://static1.squarespace.com/static/6497b82ac1b2fa02e60022ac/t/64a85e734ddd2a05a4d59a5a/1688755828840/Japonismes%2BAM.pdf"
-      }
-    ]
+    "abstract": "This article studies the Paris exposition Japonismes 2018, organized by the Japanese government to introduce the European public to the profundity of Japanese culture. It examines the organizational deliberations leading up to the exposition; the curation of individual exhibits held within its ambit; and the cultural politics of ‘Japan expositions’ that began with Japonismes and continue to this day. It argues that the organizers and exhibits in Japonismes make political use of the trope of a timeless, mystical, and animistic Japanese sense of beauty that supposedly unites prehistoric pottery and contemporary comics and animation. This Japanese aesthetic vision claims to provide an alternative to Western norms, thereby promising to resolve contemporary problems, such as anthropocentrism, by influencing Western aesthetics as it had in the late nineteenth century. Japonismes exemplifies how Japanese soft power diplomacy can employ Western tropes about Japan, such as Japonisme, for its economic and nation-branding efforts.",
+    "hook": "The Japanese government organized Japonismes 2018 in Paris to introduce audiences to Japanese culture. This article traces the event’s planning and curation, asking how exhibitions linked prehistoric pottery to contemporary comics and animation through the idea of a timeless Japanese aesthetic. It shows how Japanese cultural diplomacy adapted older Western ideas about Japan to serve economic and political ends.",
+    "abstractLabel": "Abstract",
+    "keywords": [
+      "animism",
+      "aesthetics",
+      "public diplomacy",
+      "Orientalism",
+      "contemporary art"
+    ],
+    "issue": "1",
+    "publicationDate": "2023-04",
+    "doi": "10.1163/24054992-08010001",
+    "publicPdf": "japonisme-accepted-manuscript.pdf",
+    "publicText": "japonisme-accepted-manuscript.txt",
+    "publicTextLabel": "Read accepted manuscript",
+    "publicPdfLabel": "Accepted manuscript (PDF)",
+    "publicVersionNote": "This is the author’s accepted manuscript of an article published by Brill in Journal of Japonisme. The published article is available at https://doi.org/10.1163/24054992-08010001."
   }
 ]
