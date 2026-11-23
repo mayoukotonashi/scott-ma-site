@@ -211,7 +211,7 @@ def write_profile_pages():
     dissertation_title = SITE.get("dissertationTitle", SITE["researchTitle"])
     dissertation_description = f"{dissertation_title}. Dissertation research by {SITE['name']}."
     dissertation = f'''<main id="main" class="research-page">
-  {page_header(dissertation_title, label="Dissertation", split_title=True)}
+  {page_header(dissertation_title, SITE["researchSubtitle"], label="Dissertation", split_title=True)}
   <div class="frame page-body dissertation-layout">
     <section class="prose dissertation-abstract" aria-labelledby="dissertation-abstract">
       <h2 id="dissertation-abstract">Dissertation abstract</h2>
