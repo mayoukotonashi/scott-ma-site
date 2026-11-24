@@ -387,7 +387,7 @@ def write_publication(paper, previous, following):
   </div>
   <div class="frame">{article_neighbors(previous, following)}</div>
 </main>
-<script src="../../assets/article-reader.js?v=6" defer></script>'''
+<script src="../../assets/article-reader.js?v=7" defer></script>'''
     metadata = publication_metadata(paper, route, description, record_pdf_url)
     write_page(route, f'{title} | {SITE["name"]}', description,
                content, active="publications", extra_head=metadata, article=True)
@@ -423,22 +423,19 @@ def article_neighbors(previous, following, edge=False):
         label, arrow = ("Previous article", "←") if direction == "prev" else ("Next article", "→")
         href = f'../{escape(paper["slug"])}/'
         title = escape(paper["title"])
-        info = f'<span class="label">{label}</span><span class="neighbor-title">{title}</span>'
         if edge:
-            tab_label = label.removesuffix(" article")
             links.append(f'''<a class="article-edge article-edge-{direction}" href="{href}" rel="{direction}" aria-label="{label}, {title}">
   <span class="article-edge-arrow" aria-hidden="true">{arrow}</span>
-  <span class="article-edge-label">{tab_label}</span>
-  <span class="neighbor-title">{title}</span>
+  <span class="neighbor-title" aria-hidden="true">{title}</span>
 </a>''')
         else:
             links.append(f'''<a href="{href}" rel="{direction}">
-  {info}
+  <span class="label">{label}</span><span class="neighbor-title">{title}</span>
 </a>''')
     if not links:
         return ""
     if edge:
-        return f'<nav class="article-edges" aria-label="Article shortcuts">{"".join(links)}</nav>'
+        return f'<nav class="article-edges" aria-label="Article shortcuts" inert>{"".join(links)}</nav>'
     return f'<nav class="article-neighbors" id="article-neighbors" tabindex="-1" aria-label="More publications">{"".join(links)}</nav>'
 
 
