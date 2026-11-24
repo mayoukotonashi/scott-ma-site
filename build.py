@@ -444,18 +444,19 @@ def publication_pdf_name(paper):
 
 
 def publication_links(paper, pdf_name):
-    links = [f'<a class="primary" href="{https_url(paper["link"])}">Publisher version of record</a>']
-    pdf_label = paper.get("publicPdfLabel", "Download reading PDF")
+    publisher_class = "" if pdf_name else ' class="primary"'
+    links = [f'<a{publisher_class} href="{https_url(paper["link"])}">Publisher version of record</a>']
     if pdf_name:
-        download = ' download' if pdf_name == "reading-edition.pdf" else ""
-        links.append(f'<a href="./{pdf_name}"{download}>{escape(pdf_label)}</a>')
+        download_name = escape(paper["slug"]) + ".pdf"
+        links.insert(0, f'<a class="primary" href="./{pdf_name}" download="{download_name}">Download PDF</a>')
         if paper.get("license") and not paper.get("publicText"):
             license_url = https_url(paper["license"]["url"])
             license_label = escape(paper["license"]["label"])
             links.append(f'<a href="{license_url}">{license_label}</a>')
+    download_labels = {"download pdf", "download reading pdf", paper.get("publicPdfLabel", "").casefold()}
     links.extend(f'<a href="{https_url(item["url"])}">{escape(item["label"])}</a>'
                  for item in paper.get("links", [])
-                 if not pdf_name or item["label"].casefold() != pdf_label.casefold())
+                 if not pdf_name or item["label"].casefold() not in download_labels)
     links.append('<a href="./citation.bib" download>BibTeX</a>')
     return "".join(links)
 
