@@ -1,0 +1,74 @@
+{
+  "": {
+    "asset": "share-home.jpg",
+    "alt": "Color woodblock print of moonlit rice terraces and mountains in Sarashina"
+  },
+  "research": {
+    "asset": "share-research.jpg",
+    "alt": "Black-and-white photograph of Sapporo Agricultural College buildings"
+  },
+  "publications/homi": {
+    "asset": "share-homi.jpg",
+    "alt": "Entrance sign and mosaic at the Homi Danchi housing complex in Toyota",
+    "credit": "Homi Danchi (保見団地), Toyota, Abasaa (あばさー), 2016 (cropped)",
+    "source": "https://commons.wikimedia.org/wiki/File:Homi_Danchi_01.JPG",
+    "license": "Public domain",
+    "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  "publications/chinatown": {
+    "asset": "share-chinatown.jpg",
+    "alt": "Red and gold Zenrin Gate at Yokohama Chinatown",
+    "credit": "Zenrin Gate (善隣門), Yokohama Chinatown, Zairon, 2018 (cropped)",
+    "source": "https://commons.wikimedia.org/wiki/File:Yokohama_Chinatown_Zenrimon_Gate_1.jpg",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  "publications/nagasaki": {
+    "asset": "share-nagasaki.jpg",
+    "alt": "Panorama of the reconstructed historic Dejima district in Nagasaki",
+    "credit": "Panorama of Dejima (出島), Nagasaki, STA3816, 2012 (cropped)",
+    "source": "https://commons.wikimedia.org/wiki/File:Dejima.jpg",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/"
+  },
+  "publications/japonisme": {
+    "asset": "share-japonisme.jpg",
+    "alt": "Round, reddish earthenware jar with incised decoration from the Late Jōmon period",
+    "credit": "Late Jōmon (縄文) ceramic jar, The Metropolitan Museum of Art, 1975.268.184, ca. 2500–1000 BCE (cropped)",
+    "source": "https://www.metmuseum.org/art/collection/search/50165",
+    "license": "Public domain",
+    "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  "publications/isekai": {
+    "asset": "share-isekai.jpg",
+    "alt": "Hand-colored 1493 woodcut of a walled European city with towers and red roofs",
+    "credit": "View of Nuremberg, Nuremberg Chronicle, Michael Wolgemut and Wilhelm Pleydenwurff, 1493 (cropped)",
+    "source": "https://commons.wikimedia.org/wiki/File:Nuremberg_chronicles_-_Nuremberga.png",
+    "license": "Public domain",
+    "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  "publications/webnovels": {
+    "asset": "share-webnovels.jpg",
+    "alt": "Hand-colored Japanese woodblock-printed cover of an illustrated book",
+    "credit": "Cover From a Japanese Illustrated Book, Okumura Masanobu (奥村政信), The Metropolitan Museum of Art, JP3025, ca. 1739 (cropped)",
+    "source": "https://www.metmuseum.org/art/collection/search/56423",
+    "license": "Public domain",
+    "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  "publications/hamatora": {
+    "asset": "share-hamatora.jpg",
+    "alt": "Color postcard of shops and pedestrians on Motomachi Street in Yokohama in 1907",
+    "credit": "Motomachi Street (元町通り), Yokohama (横浜), 1907. New York Public Library, digital image 4044222 (cropped)",
+    "source": "https://commons.wikimedia.org/wiki/File:Motomachi_street_Yokohama_(NYPL_Hades-2360423-4044222).jpg",
+    "license": "Public domain",
+    "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/"
+  },
+  "publications/port": {
+    "asset": "share-port.jpg",
+    "alt": "The Nippon Maru sailing ship and the Yokohama Port Museum",
+    "credit": "Nippon Maru (日本丸) and the Yokohama Port Museum (横浜みなと博物館). Photograph by Scott Ma, January 2023, Figure 2 (cropped)",
+    "source": "https://www.scott-ma.com/publications/port/#article-text",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/"
+  }
+}

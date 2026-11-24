@@ -22,6 +22,7 @@ LAYOUT = Template((SOURCE / "templates/base.html").read_text(encoding="utf-8"))
 PUBLICATIONS = json.loads((SOURCE / "publications.json").read_text(encoding="utf-8"))
 GALLERY_PATH = SOURCE / "gallery.json"
 GALLERY = json.loads(GALLERY_PATH.read_text(encoding="utf-8")) if GALLERY_PATH.exists() else []
+PAGE_IMAGES = json.loads((SOURCE / "page-images.json").read_text(encoding="utf-8"))
 NAVIGATION = {"": "Home", "research": "Research", "publications": "Publications", "cv": "CV"}
 
 
@@ -94,6 +95,34 @@ def https_url(link):
     return escape(link)
 
 
+def page_image(route):
+    return PAGE_IMAGES.get(route, PAGE_IMAGES[""])
+
+
+def social_metadata(route, title, description, article=False):
+    image = page_image(route)
+    image_url = origin_url("assets") + image["asset"]
+    properties = {
+        "og:type": "article" if article else "website",
+        "og:site_name": SITE["name"],
+        "og:title": title,
+        "og:description": description,
+        "og:url": origin_url(route),
+        "og:image": image_url,
+        "og:image:type": "image/jpeg",
+        "og:image:width": "1200",
+        "og:image:height": "630",
+        "og:image:alt": image["alt"],
+    }
+    card = {"twitter:card": "summary_large_image", "twitter:title": title,
+            "twitter:description": description, "twitter:image": image_url, "twitter:image:alt": image["alt"]}
+    return "\n  ".join(
+        f'<meta {attribute}="{name}" content="{escape(value)}">'
+        for attribute, values in (("property", properties), ("name", card))
+        for name, value in values.items()
+    )
+
+
 def write_page(route, title, description, content, active=None, extra_head="", article=False):
     path = OUTPUT / route / "index.html"
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -109,14 +138,13 @@ def write_page(route, title, description, content, active=None, extra_head="", a
             title=escape(title),
             description=escape(description),
             canonical=escape(origin_url(route)),
-            site_url=escape(SITE["url"]),
             email=escape(SITE["email"]),
             affiliation=escape(SITE["affiliation"]),
             root="/".join([".."] * len(route.split("/"))) if route else ".",
             navigation="\n".join(navigation),
             content=content,
             extra_head=extra_head,
-            og_type="article" if article else "website",
+            social_head=social_metadata(route, title, description, article=article),
         ),
         encoding="utf-8",
     )
@@ -126,6 +154,9 @@ def write_alias(route, target):
     path = OUTPUT / route / "index.html"
     path.parent.mkdir(parents=True, exist_ok=True)
     relative = local_url(route, target)
+    paper = next((item for item in PUBLICATIONS if target == f'publications/{item["slug"]}'), None)
+    title = paper["title"] if paper else {"research": SITE["researchTitle"], "cv": "Curriculum Vitae", "privacy": "Privacy Policy"}[target]
+    description = plain_inline(paper.get("hook") or paper.get("abstract", "")) if paper else SITE["tagline"]
     path.write_text(
         f'''<!doctype html>
 <html lang="en">
@@ -133,7 +164,8 @@ def write_alias(route, target):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="canonical" href="{escape(origin_url(target))}">
-<title>Page moved | {escape(SITE["name"])}</title>
+<title>{escape(title)} | {escape(SITE["name"])}</title>
+{social_metadata(target, title, description, article=paper is not None)}
 <script>location.replace({json.dumps(relative)} + location.search + location.hash);</script>
 <noscript><meta http-equiv="refresh" content="0;url={relative}"></noscript>
 </head>
@@ -144,7 +176,7 @@ def write_alias(route, target):
     )
 
 
-def page_header(heading, subtitle="", label="", back=False, split_title=False):
+def page_header(heading, subtitle="", label="", back=False, split_title=False, image=None):
     back_link = '<a class="back-link" href="../">All publications</a>' if back else ""
     context = f'<p class="label">{escape(label)}</p>' if label else ""
     deck = f'<p class="subtitle">{escape(subtitle)}</p>' if subtitle else ""
@@ -153,9 +185,27 @@ def page_header(heading, subtitle="", label="", back=False, split_title=False):
         lead, continuation = heading.split(": ", 1)
         title = f'{escape(lead)}: <span class="title-continuation">{escape(continuation)}</span>'
     style = "page-head article-head" if back else "page-head"
-    return f'''<div class="{style}"><div class="frame">
+    artwork = ''
+    if image:
+        filename = escape(image["asset"])
+        artwork = f'<img class="article-head-image" src="../../assets/{filename}" width="1200" height="630" alt="" fetchpriority="high">'
+    return f'''<div class="{style}">{artwork}<div class="frame">
   {back_link}{context}<h1>{title}</h1>{deck}
 </div></div>'''
+
+
+def image_credit(image):
+    if not image.get("credit"):
+        return ""
+    credit = escape(image["credit"])
+    if image.get("source"):
+        credit = f'<a href="{https_url(image["source"])}">{credit}</a>'
+    license_label = escape(image.get("license", ""))
+    if license_label and image.get("licenseUrl"):
+        license_label = f'<a href="{https_url(image["licenseUrl"])}">{license_label}</a>'
+    if license_label:
+        credit += f' · {license_label}'
+    return f'<p class="article-image-credit">{credit}</p>'
 
 
 def prose_page(heading, body):
@@ -196,6 +246,11 @@ def write_profile_pages():
     affiliation = escape(SITE["affiliation"])
     project = escape(SITE["researchTitle"])
     subtitle = escape(SITE["researchSubtitle"])
+    google_verification = SITE.get("googleSiteVerification")
+    home_head = (
+        f'<meta name="google-site-verification" content="{escape(google_verification)}">'
+        if google_verification else ""
+    )
     write_page("", f'{SITE["name"]} | {SITE["tagline"]}', SITE["tagline"], f'''<main id="main">
   <div class="hero"><div class="frame hero-inner">
     <div>
@@ -217,9 +272,9 @@ def write_profile_pages():
       </aside>
     </div>
   </div>
-</main>''')
+</main>''', extra_head=home_head)
     dissertation_title = SITE["researchTitle"]
-    dissertation_description = f"{dissertation_title}. Dissertation research by {SITE['name']}."
+    dissertation_description = f'{SITE["researchSubtitle"]}. Dissertation research by {SITE["name"]}.'
     dissertation = f'''<main id="main" class="research-page">
   {page_header(dissertation_title, SITE["researchSubtitle"], label="Dissertation")}
   <div class="frame page-body dissertation-layout">
@@ -234,7 +289,8 @@ def write_profile_pages():
         dissertation,
         extra_head=structured_data(**{"@type": "WebPage", "name": dissertation_title, "url": origin_url("research"),
                                      "description": dissertation_description,
-                                     "author": {"@type": "Person", "name": SITE["name"]}}),
+                                     "author": {"@type": "Person", "name": SITE["name"]},
+                                     "mainEntity": {"@type": "CreativeWork", "name": SITE["dissertationTitle"]}}),
     )
     cv = markdown("cv") + '\n<p>For my publication record, see <a href="../publications/">Publications</a>.</p>'
     write_page("cv", f'CV | {SITE["name"]}', "Appointments, education, fellowships, and languages.", prose_page("Curriculum Vitae", cv))
@@ -242,12 +298,23 @@ def write_profile_pages():
     write_page("privacy", f'Privacy | {SITE["name"]}', "Privacy practices for this academic website.", prose_page("Privacy Policy", privacy))
 
 
-def citation(paper, include_year=False):
-    year = f' ({paper["year"]})' if include_year else ""
+def citation(paper, include_year=False, *, full=False):
+    year = f' ({paper["year"]})' if include_year or full else ""
     volume = "" if paper.get("issueOnly") else f' {escape(str(paper["volume"]))}'
     number = paper_issue(paper)
     issue = f", no. {escape(str(number))}" if number else ""
-    return f'<cite>{escape(paper["journal"])}</cite>{volume}{issue}{year}, {escape(paper["pages"])}.'
+    journal = f'<cite>{escape(paper["journal"])}</cite>{volume}{issue}{year}'
+    pages = escape(paper["pages"])
+    if not full:
+        return f"{journal}, {pages}."
+
+    authors = paper.get("citationAuthors", paper["authors"])
+    byline = f"{authors[0]} et al." if len(authors) > 2 else " and ".join(authors)
+    title = escape(paper["title"].replace("“", "‘").replace("”", "’"))
+    doi = paper_doi(paper)
+    source = f"https://doi.org/{doi}" if doi else paper["link"]
+    link = https_url(source)
+    return f'{escape(byline)}, “{title},” {journal}: {pages}, <a href="{link}">{link}</a>.'
 
 
 def paper_issue(paper):
@@ -349,6 +416,10 @@ def write_publications():
     (OUTPUT / "publications/scott-ma.bib").write_text("\n".join(map(bibtex, papers)), encoding="utf-8")
 
 
+def visible_keyword(keyword):
+    return re.sub(r"(?<=[A-Za-z\u00c0-\u024f])\s*[（(][\u3005\u3040-\u30ff\u3400-\u9fff]+[）)]$", "", keyword)
+
+
 def write_publication(paper, previous, following):
     route = f'publications/{paper["slug"]}'
     title = paper["title"]
@@ -361,7 +432,7 @@ def write_publication(paper, previous, following):
     hook_html = f'<p class="article-hook"><strong>{inline(hook)}</strong></p>' if hook else ""
     abstract_label = paper.get("abstractLabel", "Summary")
     abstract = article_section("article-abstract", abstract_label, markdown_text(summary, heading_level=3))
-    keywords = "".join(f"<li>{escape(keyword)}</li>" for keyword in paper.get("keywords", []))
+    keywords = "".join(f"<li>{escape(visible_keyword(keyword))}</li>" for keyword in paper.get("keywords", []))
     keywords_label = paper.get("keywordsLabel", "Keywords")
     keywords = article_section("article-keywords", keywords_label, f'<ul class="keywords">{keywords}</ul>') if keywords else ""
     edition_label = paper.get("publicTextLabel", "Full text")
@@ -369,8 +440,9 @@ def write_publication(paper, previous, following):
     contents = [("article-abstract", abstract_label)] if abstract else []
     if edition:
         contents.append(("article-text", edition_label))
+    cover = page_image(route)
     content = f'''<main id="main" class="article-page">
-  {page_header(title, authors, back=True, split_title=True)}
+  {page_header(title, authors, back=True, split_title=True, image=cover)}
   <div class="frame article-tools" id="article-resources" tabindex="-1">
     <p class="article-citation">{citation(paper, include_year=True)}</p>
     <div class="resource-links">{publication_links(paper, pdf_name)}</div>
@@ -385,7 +457,7 @@ def write_publication(paper, previous, following):
       {edition}
     </article>
   </div>
-  <div class="frame">{article_neighbors(previous, following)}</div>
+  <div class="frame">{image_credit(cover)}{article_neighbors(previous, following)}</div>
 </main>
 <script src="../../assets/article-reader.js?v=7" defer></script>'''
     metadata = publication_metadata(paper, route, description, record_pdf_url)
@@ -473,8 +545,7 @@ def publication_text(paper):
     if not paper.get("publicText"):
         return "", [], set()
     text = asset_path(paper["publicText"]).read_text(encoding="utf-8")
-    authors = escape(", ".join(paper["authors"]))
-    credit = f'<p class="full-text-credit">{authors}. {citation(paper, include_year=True)}'
+    credit = f'<p class="full-text-credit">{citation(paper, full=True)}'
     if paper.get("license"):
         license_url = https_url(paper["license"]["url"])
         license_label = escape(paper["license"]["label"])
@@ -640,7 +711,8 @@ def publication_metadata(paper, route, description, pdf_url):
     article = {"@type": "ScholarlyArticle", "headline": title, "description": description,
                "url": origin_url(route), "mainEntityOfPage": origin_url(route),
                "sameAs": paper["link"], "author": [{"@type": "Person", "name": name} for name in paper["authors"]],
-               "datePublished": published.replace("/", "-"), "isPartOf": collection, "pagination": paper["pages"]}
+               "datePublished": published.replace("/", "-"), "isPartOf": collection, "pagination": paper["pages"],
+               "image": origin_url("assets") + page_image(route)["asset"]}
     if doi:
         article["identifier"] = {"@type": "PropertyValue", "propertyID": "DOI", "value": doi}
     if paper.get("keywords"):
@@ -679,6 +751,7 @@ def build():
     (OUTPUT / "assets").mkdir(parents=True)
     site_assets = {"article-reader.js", "favicon.svg", "site.css", "scott-ma.webp", "publications.js"}
     site_assets.update(image["asset"] for image in GALLERY)
+    site_assets.update(image["asset"] for image in PAGE_IMAGES.values())
     for name in sorted(site_assets):
         shutil.copyfile(asset_path(name), OUTPUT / "assets" / name)
     write_profile_pages()
@@ -690,7 +763,7 @@ def build():
                 source = OUTPUT / new / filename
                 if source.is_file():
                     shutil.copyfile(source, OUTPUT / old / filename)
-    urls = [origin_url(route) for route in [*NAVIGATION, *(f'publications/{paper["slug"]}' for paper in PUBLICATIONS)]]
+    urls = [origin_url(route) for route in [*NAVIGATION, "privacy", *(f'publications/{paper["slug"]}' for paper in PUBLICATIONS)]]
     urls.extend(f'{origin_url(f"publications/{paper["slug"]}")}{publication_pdf_name(paper)}'
                 for paper in PUBLICATIONS if publication_pdf_name(paper))
     entries = "\n".join(f"  <url><loc>{escape(url)}</loc></url>" for url in urls)
