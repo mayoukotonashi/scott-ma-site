@@ -358,7 +358,7 @@ def write_publication(paper, previous, following):
     description = plain_inline(hook or summary) or f"{title}, by {authors}."
     pdf_name = publication_pdf_name(paper)
     record_pdf_url = f"{origin_url(route)}{pdf_name}" if pdf_name == "version-of-record.pdf" else ""
-    hook_html = f'<p class="article-hook">{inline(hook)}</p>' if hook else ""
+    hook_html = f'<p class="article-hook"><strong>{inline(hook)}</strong></p>' if hook else ""
     abstract_label = paper.get("abstractLabel", "Summary")
     abstract = article_section("article-abstract", abstract_label, markdown_text(summary, heading_level=3))
     keywords = "".join(f"<li>{escape(keyword)}</li>" for keyword in paper.get("keywords", []))
@@ -367,11 +367,8 @@ def write_publication(paper, previous, following):
     edition_label = paper.get("publicTextLabel", "Full text")
     edition, headings, figures = publication_text(paper)
     contents = [("article-abstract", abstract_label)] if abstract else []
-    if keywords:
-        contents.append(("article-keywords", keywords_label))
     if edition:
         contents.append(("article-text", edition_label))
-    contents.append(("article-resources", "Article links"))
     content = f'''<main id="main" class="article-page">
   {page_header(title, authors, back=True, split_title=True)}
   <div class="frame article-tools" id="article-resources" tabindex="-1">
@@ -402,20 +399,13 @@ def write_publication(paper, previous, following):
 
 
 def article_contents(contents, headings):
-    reader_headings = []
-    after_conclusion = False
-    for anchor, label, level in headings:
-        if not after_conclusion or label.casefold() in {"notes", "references", "works cited", "bibliography"}:
-            reader_headings.append((anchor, label, level))
-        if re.match(r"(?:\d+\.\s+)?conclusion\b", label, re.IGNORECASE):
-            after_conclusion = True
     items = []
     for section_id, label in contents:
         children = ""
-        if section_id == "article-text" and reader_headings:
+        if section_id == "article-text" and headings:
             children = "".join(
                 f'<li class="contents-level-{level}"><a href="#{escape(anchor)}">{inline(heading)}</a></li>'
-                for anchor, heading, level in reader_headings
+                for anchor, heading, level in headings
             )
             children = f'<ul class="reader-sections">{children}</ul>'
         items.append(f'<li><a href="#{section_id}">{escape(label)}</a>{children}</li>')
@@ -502,6 +492,8 @@ def article_markdown(content):
     anchors = set()
     notes, references = [], {}
     notes_position = None
+    conclusion_level = None
+    in_back_matter = False
     ordered = re.compile(r"(?m)^(\d+)\\?[.)][ \t]+")
     footnote = re.compile(r"(?m)^\[\^(\d+)\]:[ \t]+")
     available_notes = {int(marker[1]) for marker in footnote.finditer(content)}
@@ -561,7 +553,15 @@ def article_markdown(content):
                 anchor = f"section-{base}-{count}"
             anchors.add(anchor)
             level = len(marks) + 1
-            headings.append((anchor, label, level))
+            if conclusion_level is not None and level <= conclusion_level:
+                parts.append('<hr class="article-end-rule" aria-label="End of article text">')
+                in_back_matter = True
+                conclusion_level = None
+            heading_text = plain_inline(label).casefold()
+            if not in_back_matter or heading_text in {"notes", "references", "works cited", "bibliography"}:
+                headings.append((anchor, label, level))
+            if not in_back_matter and re.match(r"(?:\d+\.\s+)?conclusion\b", heading_text):
+                conclusion_level = level
             parts.append(f'<h{level} id="{escape(anchor)}" tabindex="-1">{render_inline(label)}</h{level}>')
         elif figure := re.fullmatch(rf"{figure_pattern}(?:\n([\s\S]+))?", block):
             alt, filename, caption = figure.groups()
@@ -604,10 +604,12 @@ def numbered_article_items(block, pattern):
 def article_footnotes(notes, references):
     items = []
     for number, text in notes:
+        targets = references.get(number, [])
         backlinks = "".join(
             f' <a href="#{target}" class="note-backlink" role="doc-backlink" '
-            f'aria-label="Back to note {number}, reference {index}">↩</a>'
-            for index, target in enumerate(references.get(number, []), 1)
+            f'aria-label="Back to text at note {number}, reference {index}">'
+            f'Back to text{f" {index}" if len(targets) > 1 else ""}</a>'
+            for index, target in enumerate(targets, 1)
         )
         items.append(f'<li id="footnote-{number}" value="{number}" tabindex="-1">'
                      f'<span class="note-text">{text}</span>{backlinks}</li>')
