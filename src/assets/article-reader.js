@@ -140,11 +140,12 @@ function initializeArticleEdges(article, signal) {
     const bounds = layout.getBoundingClientRect();
     const center = window.innerHeight / 2;
     const visible = desktop.matches && bounds.top <= center && bounds.bottom >= center;
-    nav.toggleAttribute("data-visible", visible);
-    if (!visible || !pointer) {
-      delete nav.dataset.gutter;
+    nav.inert = !visible;
+    if (!visible) {
+      resetEdges();
       return;
     }
+    if (!pointer) return;
     const {x, y} = pointer;
     const hovered = document.elementFromPoint(x, y);
     const shortcut = hovered?.closest(".article-edge");
@@ -158,10 +159,10 @@ function initializeArticleEdges(article, signal) {
     const articleBounds = text.getBoundingClientRect();
     const width = document.documentElement.clientWidth;
     if (previous && (shortcut?.rel === "prev" || x < articleBounds.left)) {
-      nav.style.setProperty("--gutter-width", `${articleBounds.left}px`);
+      nav.style.setProperty("--prev-gutter-width", `${articleBounds.left}px`);
       nav.dataset.gutter = "prev";
     } else if (next && (shortcut?.rel === "next" || x >= articleBounds.right)) {
-      nav.style.setProperty("--gutter-width", `${width - articleBounds.right}px`);
+      nav.style.setProperty("--next-gutter-width", `${width - articleBounds.right}px`);
       nav.dataset.gutter = "next";
     } else {
       delete nav.dataset.gutter;
@@ -188,6 +189,7 @@ function initializeArticleEdges(article, signal) {
   window.addEventListener("blur", resetEdges, {signal});
   window.addEventListener("resize", scheduleUpdate, {signal});
   window.addEventListener("scroll", scheduleUpdate, {passive: true, signal});
+  desktop.addEventListener("change", scheduleUpdate, {signal});
   signal.addEventListener("abort", () => window.cancelAnimationFrame(frame), {once: true});
   updateEdges();
 }
