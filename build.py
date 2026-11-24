@@ -428,7 +428,7 @@ def write_publication(paper, previous, following):
     hook = paper.get("hook", "")
     description = plain_inline(hook or summary) or f"{title}, by {authors}."
     pdf_name = publication_pdf_name(paper)
-    record_pdf_url = f"{origin_url(route)}{pdf_name}" if pdf_name == "version-of-record.pdf" else ""
+    pdf_url = f"{origin_url(route)}{pdf_name}" if pdf_name else ""
     hook_html = f'<p class="article-hook"><strong>{inline(hook)}</strong></p>' if hook else ""
     abstract_label = paper.get("abstractLabel", "Summary")
     abstract = article_section("article-abstract", abstract_label, markdown_text(summary, heading_level=3))
@@ -460,7 +460,7 @@ def write_publication(paper, previous, following):
   <div class="frame">{image_credit(cover)}{article_neighbors(previous, following)}</div>
 </main>
 <script src="../../assets/article-reader.js?v=7" defer></script>'''
-    metadata = publication_metadata(paper, route, description, record_pdf_url)
+    metadata = publication_metadata(paper, route, description, pdf_url)
     write_page(route, f'{title} | {SITE["name"]}', description,
                content, active="publications", extra_head=metadata, article=True)
     (OUTPUT / route / "citation.bib").write_text(bibtex(paper), encoding="utf-8")
@@ -721,7 +721,7 @@ def publication_metadata(paper, route, description, pdf_url):
         article["abstract"] = plain_inline(paper["abstract"])
     if pdf_url:
         article["encoding"] = {"@type": "MediaObject", "encodingFormat": "application/pdf", "contentUrl": pdf_url,
-                               "name": paper.get("publicPdfLabel", "Version of record (PDF)")}
+                               "name": paper.get("publicPdfLabel", "Reading edition (PDF)")}
     if paper.get("license"):
         article["license"] = paper["license"]["url"]
     return meta + "\n  " + structured_data(**article)
