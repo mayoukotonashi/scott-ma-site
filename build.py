@@ -27,8 +27,13 @@ NAVIGATION = {"": "Home", "research": "Research", "publications": "Publications"
 
 def inline(text):
     """Render the emphasis used in the site's Markdown files."""
-    text = re.sub(r"\*\*(?=\S)(.+?)(?<=\S)\*\*", r"<strong>\1</strong>", escape(text))
+    text = escape(text).replace(r"\*", "&#42;")
+    text = re.sub(r"\*\*(?=\S)(.+?)(?<=\S)\*\*", r"<strong>\1</strong>", text)
     return re.sub(r"(?<!\*)\*(?=\S)([^*]+?)(?<=\S)\*(?!\*)", r"<em>\1</em>", text)
+
+
+def plain_inline(text):
+    return unescape(re.sub(r"</?(?:em|strong)>", "", inline(text)))
 
 
 def markdown(name):
@@ -45,9 +50,14 @@ def markdown_text(content, heading_level=2, render_inline=inline):
         elif all(line.startswith("- ") for line in lines):
             items = "".join(f"<li>{render_inline(line[2:])}</li>" for line in lines)
             parts.append(f"<ul>{items}</ul>")
-        elif all(line.startswith("> ") for line in lines):
-            quote = render_inline(" ".join(line[2:] for line in lines))
-            parts.append(f"<blockquote><p>{quote}</p></blockquote>")
+        elif all(line == ">" or line.startswith("> ") for line in lines):
+            paragraphs = "\n".join(line[2:] for line in lines)
+            quotes = []
+            for paragraph in filter(None, paragraphs.split("\n\n")):
+                verse_lines = re.split(r" {2,}\n", paragraph)
+                quote = "<br>\n".join(render_inline(" ".join(line.splitlines())) for line in verse_lines)
+                quotes.append(f"<p>{quote}</p>")
+            parts.append(f"<blockquote>{''.join(quotes)}</blockquote>")
         else:
             parts.append(f"<p>{render_inline(' '.join(lines))}</p>")
     return "\n".join(parts)
@@ -345,7 +355,7 @@ def write_publication(paper, previous, following):
     authors = ", ".join(paper["authors"])
     summary = paper.get("abstract", "")
     hook = paper.get("hook", "")
-    description = hook or summary or f"{title}, by {authors}."
+    description = plain_inline(hook or summary) or f"{title}, by {authors}."
     pdf_name = publication_pdf_name(paper)
     record_pdf_url = f"{origin_url(route)}{pdf_name}" if pdf_name == "version-of-record.pdf" else ""
     hook_html = f'<p class="article-hook">{inline(hook)}</p>' if hook else ""
@@ -362,8 +372,6 @@ def write_publication(paper, previous, following):
     if edition:
         contents.append(("article-text", edition_label))
     contents.append(("article-resources", "Article links"))
-    if previous or following:
-        contents.append(("article-neighbors", "More publications"))
     content = f'''<main id="main" class="article-page">
   {page_header(title, authors, back=True, split_title=True)}
   <div class="frame article-tools" id="article-resources" tabindex="-1">
@@ -394,13 +402,20 @@ def write_publication(paper, previous, following):
 
 
 def article_contents(contents, headings):
+    reader_headings = []
+    after_conclusion = False
+    for anchor, label, level in headings:
+        if not after_conclusion or label.casefold() in {"notes", "references", "works cited", "bibliography"}:
+            reader_headings.append((anchor, label, level))
+        if re.match(r"(?:\d+\.\s+)?conclusion\b", label, re.IGNORECASE):
+            after_conclusion = True
     items = []
     for section_id, label in contents:
         children = ""
-        if section_id == "article-text" and headings:
+        if section_id == "article-text" and reader_headings:
             children = "".join(
                 f'<li class="contents-level-{level}"><a href="#{escape(anchor)}">{inline(heading)}</a></li>'
-                for anchor, heading, level in headings
+                for anchor, heading, level in reader_headings
             )
             children = f'<ul class="reader-sections">{children}</ul>'
         items.append(f'<li><a href="#{section_id}">{escape(label)}</a>{children}</li>')
@@ -632,7 +647,7 @@ def publication_metadata(paper, route, description, pdf_url):
     if paper.get("keywords"):
         article["keywords"] = paper["keywords"]
     if paper.get("abstract") and paper.get("abstractLabel") == "Abstract":
-        article["abstract"] = paper["abstract"]
+        article["abstract"] = plain_inline(paper["abstract"])
     if pdf_url:
         article["encoding"] = {"@type": "MediaObject", "encodingFormat": "application/pdf", "contentUrl": pdf_url,
                                "name": paper.get("publicPdfLabel", "Version of record (PDF)")}
