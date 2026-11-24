@@ -65,9 +65,25 @@ nav a[aria-current="page"] { font-weight: 650; }
 .page-head .subtitle { max-width: 43rem; font: clamp(1.18rem, 2.4vw, 1.7rem)/1.45 var(--serif); margin-top: 1.15rem; }
 .page-head .back-link { display: inline-block; font-size: .9rem; margin-bottom: 1.7rem; }
 .title-continuation { display: block; max-width: 45rem; margin-top: .3em; font-size: .69em; line-height: 1.18; letter-spacing: -.035em; }
-.page-head.article-head { padding-block: clamp(2.65rem, 5.5vw, 4.75rem) clamp(1.9rem, 4vw, 3rem); background: var(--panel); }
+.page-head.article-head {
+  position: relative;
+  padding-block: clamp(2.65rem, 5.5vw, 4.75rem) clamp(1.9rem, 4vw, 3rem);
+  background: var(--panel);
+}
+.article-head > .frame { position: relative; }
+.article-head-image {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: min(59%, 70rem);
+  height: 100%;
+  object-fit: cover;
+  opacity: .41;
+  mask-image: linear-gradient(to right, transparent 2%, #000 80%);
+  pointer-events: none;
+}
 .page-head.article-head h1 { font-size: clamp(2rem, 4.4vw, 3.65rem); line-height: 1.07; letter-spacing: -.04em; }
 .article-head .subtitle { color: var(--muted); font: clamp(1rem, 1.9vw, 1.2rem)/1.45 var(--sans); margin-top: 1.5rem; }
+.article-image-credit { margin-bottom: 1.2rem; color: var(--muted); font-size: .8rem; }
 .page-body { padding-block: clamp(2rem, 4vw, 3.25rem) clamp(3.5rem, 7vw, 6rem); }
 .prose { max-width: 43rem; font-size: 1.0625rem; line-height: 1.77; overflow-wrap: break-word; }
 .prose > * + * { margin-top: 1.15em; }
@@ -295,10 +311,11 @@ nav a[aria-current="page"] { font-weight: 650; }
   .filters { gap: .65rem; }
   .footer-inner { align-items: start; flex-direction: column; gap: .9rem; }
   .article-neighbors { grid-template-columns: minmax(0, 1fr); }
+  .article-head-image { width: 85%; opacity: .25; }
 }
 
 @media print {
-  .site-header, .site-footer, .skip-link, .resource-links, .back-link, .reader-contents, .article-neighbors, .article-edges, .note-popover { display: none; }
+  .site-header, .site-footer, .skip-link, .resource-links, .back-link, .reader-contents, .article-head-image, .article-neighbors, .article-edges, .note-popover { display: none; }
   :root { background: white; color: black; }
   .frame, .prose { width: 100%; max-width: 100%; }
   .reader-layout, .home-body, .dissertation-layout { display: block; }
