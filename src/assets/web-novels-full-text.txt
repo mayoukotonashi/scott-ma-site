@@ -71,9 +71,9 @@ While some works from Western web novel platforms like Wattpad have become print
 
 If the repackaging of amateur fiction is rare in the West, it is common across East Asia in countries such as China, Korea, and Thailand. The reason behind this commonality is a potential direction for future research, and the intricacies of their respective media cultures deserves more attention than we could give it here. Indeed, perhaps, with Wattpad’s recent acquisition by South Korea’s NAVER, we may see a convergence between these two markets. Our hope is that this preliminary account offers a starting point for future analyses of industrial shifts in the cultural industries and their wider regional and inter-regional impacts. Such a nuanced discussion of the particularities of digital transmediality in East Asia has the potential to diversify the Eurocentric bent implicit in Anglophone academia.
 
-**Iida Ichishi** is a critic and freelance journalist covering the Japanese publishing industry, focusing on the economics of web fiction, light novels, and comics in Japan and Korea. His published books include “*Wakamono no dokusho banare” to iu uso: Chūkōsei wa dono kurai, donna hon o yondeiru no ka* (The falsehood that “young people don’t read”: How much and what types of books are middle and high school students reading?) (Heibonsha, 2023), *Uebu shōsetsu 30-nen shi: Nihon no bungei no “hanbun*” (30-year history of web novels: “Half” of Japanese literature) (Seikaisha, 2022), *Raito noberu kuronikuru 2010–2021* (Light novel chronicles: 2010–2021) (P-Vine, 2021), and *Manga zasshi wa shinda. De, dō naru no*?: *Manga apuri ikō no manga bijinesu daitenkan jidai* (Manga magazines are dead. So, what now?: The era of great change in the manga business since manga apps) (Seikaisha, 2018).
+**Iida Ichishi** is a critic and freelance journalist covering the Japanese publishing industry, focusing on the economics of web fiction, light novels, and comics in Japan and Korea. His published books include *“Wakamono no dokusho banare” to iu uso: Chūkōsei wa dono kurai, donna hon o yondeiru no ka* (The falsehood that “young people don’t read”: How much and what types of books are middle and high school students reading?) (Heibonsha, 2023), *Uebu shōsetsu 30-nen shi: Nihon no bungei no “hanbun”* (30-year history of web novels: “Half” of Japanese literature) (Seikaisha, 2022), *Raito noberu kuronikuru 2010–2021* (Light novel chronicles: 2010–2021) (P-Vine, 2021), and *Manga zasshi wa shinda. De, dō naru no?: Manga apuri ikō no manga bijinesu daitenkan jidai* (Manga magazines are dead. So, what now?: The era of great change in the manga business since manga apps) (Seikaisha, 2018).
 
-**Scott Ma** is preparing his doctoral dissertation at the University of Zurich, Switzerland, on the history of agricultural knowledge and colonial policy in modern East Asia, with a focus on the Japanese empire. His previous work on contemporary Japanese popular culture has been published in journals including *positions, Rethinking History*, and *The East Asian Journal of Popular Culture*.
+**Scott Ma** is preparing his doctoral dissertation at the University of Zurich, Switzerland, on the history of agricultural knowledge and colonial policy in modern East Asia, with a focus on the Japanese empire. His previous work on contemporary Japanese popular culture has been published in journals including *positions*, *Rethinking History*, and *The East Asian Journal of Popular Culture*.
 
 ## Acknowledgments
 
@@ -97,7 +97,7 @@ We thank Jaqueline Berndt, Marc Steinberg, the editors at *Mechademia*, and the 
 
 [^8]: Shuppan kagaku kenkyūjo, 5.
 
-[^9]: Iida Ichishi, *Uebu shōsetsu 30-nen shi: Nihon no bungei no “hanbun*” (30-year history of web novels: “Half” of Japanese literature) (Tokyo: Seikaisha, 2022), 21–79.
+[^9]: Iida Ichishi, *Uebu shōsetsu 30-nen shi: Nihon no bungei no “hanbun”* (30-year history of web novels: “Half” of Japanese literature) (Tokyo: Seikaisha, 2022), 21–79.
 
 [^10]: Alisa Freedman, “Thumb-Generation Literature: The Rise and Fall of Japanese Cellphone Novels,” in *Introducing Japanese Popular Culture*, ed. Alisa Freedman and Toby Slade (London: Routledge, 2018), 332.
 
@@ -121,7 +121,7 @@ We thank Jaqueline Berndt, Marc Steinberg, the editors at *Mechademia*, and the 
 
 [^20]: TOHAN, “2007-nen nenkan besutoserā” (2007 bestsellers). http://tinyurl.com/36cbkfw9.
 
-[^21]: “Kono raitonoberu ga sugoi!” (This light novel is amazing!), in *Kono Web shōsetsu ga sugoi! Intānetto-hatsu no zen Web shōsetsu besuto rankingu*! (This web novel is amazing! Best ranking of web novels), ed. Henshūbu (Tokyo: Takarajimasha, 2015), 120.
+[^21]: “Kono raitonoberu ga sugoi!” (This light novel is amazing!), in *Kono Web shōsetsu ga sugoi! Intānetto-hatsu no zen Web shōsetsu besuto rankingu!* (This web novel is amazing! Best ranking of web novels), ed. Henshūbu (Tokyo: Takarajimasha, 2015), 120.
 
 [^22]: “Hajimete no kata e” (For beginners), *Shōsetsuka ni narō* (Let’s become novelists!), Internet Archive, 5 August, 2004, https://tinyurl.com/2hkhtrrb. Accessed 24 June 2023.
 
@@ -133,7 +133,7 @@ We thank Jaqueline Berndt, Marc Steinberg, the editors at *Mechademia*, and the 
 
 [^26]: Steinberg, *Platform Economy*, 200.
 
-[^27]: Ōtsuka Eiji, *Monogatari shōhiron*: “*Bikkuriman” no shinwagaku* (Theory of narrative consumption: The mythology of “Bikkuriman”) (Tokyo: Seikaisha, 2021), 53–59.
+[^27]: Ōtsuka Eiji, *Monogatari shōhiron: “Bikkuriman” no shinwagaku* (Theory of narrative consumption: The mythology of “Bikkuriman”) (Tokyo: Seikaisha, 2021), 53–59.
 
 [^28]: Marc Steinberg, *Anime’s Media Mix: Franchising Toys and Characters in Japan* (Minneapolis: University of Minnesota Press, 2012), 180–82.
 
