@@ -7,13 +7,15 @@ The website builds to ordinary HTML, CSS, and JavaScript. The source has no pack
 | To change | Edit |
 | --- | --- |
 | Name, affiliation, contact, or dissertation heading | `src/site.json` |
-| About page | `src/home.md` |
-| Research page | `src/research.md` |
-| Curriculum vitae | `src/cv.md` |
+| Homepage, research summaries, and featured articles | `src/pages/home.html` |
+| Dissertation overview | `src/research.md` for the text and `src/pages/confucian-science.html` for headings and layout |
+| Research in Japan and work in progress | `src/pages/japan.html` and `src/pages/new-work.html` |
+| Curriculum vitae | `src/pages/cv.html` and the downloadable `src/Scott-Ma-CV.pdf` |
 | Publications, abstracts, keywords, and links | `src/publications.json` |
-| Profile illustration | `src/assets/scott-ma.webp` |
-| Historical images and credits | `src/gallery.json` and `src/assets` |
-| Layout and typography | `src/templates/base.html` and `src/assets/site.css` |
+| Header illustration | `src/assets/woman-with-cat.webp` |
+| Historical images and credits | `src/assets` and the relevant page in `src/pages/` |
+| Profile and research page design | `src/templates/profile.html` and `src/assets/identity.css` |
+| Article reader design | `src/templates/base.html`, `src/assets/site.css`, and `src/assets/reader-chrome.css` |
 
 The text files support paragraphs, second-level headings, bullets, and italic emphasis. Preserve existing publication slugs to keep their URLs working. Add an HTTPS publisher or DOI URL and any available public PDF link for new entries. The build sorts publications by year and generates the index, detail pages, filters, sitemap, and BibTeX exports.
 
