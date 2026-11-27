@@ -1,4 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="13" fill="#273f35"/>
-  <path d="M32 23c-5-6-14-7-20-4v26c6-3 15-2 20 4 5-6 14-7 20-4V19c-6-3-15-2-20 4Zm0 0v26" fill="none" stroke="#f8f7f2" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 64 64">
+  <title>Moon over the rice terraces</title>
+  <defs><clipPath id="tile"><rect width="64" height="64" rx="13"/></clipPath></defs>
+  <g clip-path="url(#tile)">
+    <path fill="#243f47" d="M0 0h64v64H0z"/>
+    <circle cx="22" cy="17" r="9" fill="#f6e2ab"/>
+    <path fill="#789e93" d="M-3 55c11-5 20-12 27-19 9-9 13-5 21-10 8-5 12-9 22-11v52H-3z"/>
+    <path fill="#365f5c" d="M-3 60c8-3 16-7 22-12 7-6 16-7 25-8 9-1 14-3 13-5-1-2-10-1-14-2 4-3 14-4 24-7v41H-3z"/>
+    <path fill="#b0cbc0" d="M-3 62c11-4 17-5 23-11 5-4 18-6 27-7 9-1 14-3 20-6v5c-6 3-13 4-22 5-11 1-18 2-23 6-7 6-15 9-25 12z"/>
+    <path fill="#8bb4ac" d="M21 67c5-6 12-9 23-11 11-2 18-3 23-6v17z"/>
+    <ellipse cx="42" cy="58" rx="7.5" ry="2" fill="#f6e2ab"/>
+  </g>
 </svg>
