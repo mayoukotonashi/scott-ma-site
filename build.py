@@ -18,6 +18,7 @@ ASSETS = SOURCE / "assets"
 SITE = json.loads((SOURCE / "site.json").read_text(encoding="utf-8"))
 if deployment_url := os.environ.get("SCOTT_MA_SITE_URL"):
     SITE["url"] = deployment_url.rstrip("/").replace("http://", "https://", 1)
+SITE_NAME = f'{SITE["name"]} - {SITE["tagline"]}'
 LAYOUT = Template((SOURCE / "templates/base.html").read_text(encoding="utf-8"))
 PUBLICATIONS = json.loads((SOURCE / "publications.json").read_text(encoding="utf-8"))
 GALLERY_PATH = SOURCE / "gallery.json"
@@ -99,12 +100,18 @@ def page_image(route):
     return PAGE_IMAGES.get(route, PAGE_IMAGES[""])
 
 
+def favicon_links(route):
+    icon = local_url(route, "assets") + "favicon.png"
+    return (f'<link rel="icon" href="{icon}" type="image/png" sizes="192x192">\n  '
+            f'<link rel="apple-touch-icon" href="{icon}">')
+
+
 def social_metadata(route, title, description, article=False):
     image = page_image(route)
     image_url = origin_url("assets") + image["asset"]
     properties = {
         "og:type": "article" if article else "website",
-        "og:site_name": SITE["name"],
+        "og:site_name": SITE_NAME,
         "og:title": title,
         "og:description": description,
         "og:url": origin_url(route),
@@ -145,6 +152,7 @@ def write_page(route, title, description, content, active=None, extra_head="", a
             content=content,
             extra_head=extra_head,
             social_head=social_metadata(route, title, description, article=article),
+            favicon_head=favicon_links(route),
         ),
         encoding="utf-8",
     )
@@ -164,12 +172,13 @@ def write_alias(route, target):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="canonical" href="{escape(origin_url(target))}">
-<title>{escape(title)} | {escape(SITE["name"])}</title>
+<title>{escape(title if paper else f"{title} | {SITE['name']}")}</title>
 {social_metadata(target, title, description, article=paper is not None)}
+{favicon_links(route)}
 <script>location.replace({json.dumps(relative)} + location.search + location.hash);</script>
-<noscript><meta http-equiv="refresh" content="0;url={relative}"></noscript>
+<meta http-equiv="refresh" content="0;url={relative}">
 </head>
-<p>This page has moved. <a href="{relative}">Continue to the new address</a>.</p>
+<p>This page has moved to <a href="{relative}">{escape(title)}</a>.</p>
 </html>
 ''',
         encoding="utf-8",
@@ -247,11 +256,11 @@ def write_profile_pages():
     project = escape(SITE["researchTitle"])
     subtitle = escape(SITE["researchSubtitle"])
     google_verification = SITE.get("googleSiteVerification")
-    home_head = (
-        f'<meta name="google-site-verification" content="{escape(google_verification)}">'
-        if google_verification else ""
-    )
-    write_page("", f'{SITE["name"]} | {SITE["tagline"]}', SITE["tagline"], f'''<main id="main">
+    home_head = structured_data(**{"@type": "WebSite", "name": SITE_NAME,
+                                   "alternateName": SITE["name"], "url": origin_url("")})
+    if google_verification:
+        home_head += f'\n  <meta name="google-site-verification" content="{escape(google_verification)}">'
+    write_page("", SITE_NAME, SITE["tagline"], f'''<main id="main">
   <div class="hero"><div class="frame hero-inner">
     <div>
       <h1>{name}</h1>
@@ -461,8 +470,7 @@ def write_publication(paper, previous, following):
 </main>
 <script src="../../assets/article-reader.js?v=7" defer></script>'''
     metadata = publication_metadata(paper, route, description, pdf_url)
-    write_page(route, f'{title} | {SITE["name"]}', description,
-               content, active="publications", extra_head=metadata, article=True)
+    write_page(route, title, description, content, active="publications", extra_head=metadata, article=True)
     (OUTPUT / route / "citation.bib").write_text(bibtex(paper), encoding="utf-8")
     if pdf_name:
         shutil.copyfile(asset_path(paper.get("publicPdf") or paper["readingPdf"]), OUTPUT / route / pdf_name)
@@ -749,11 +757,12 @@ def build():
     if OUTPUT.exists():
         shutil.rmtree(OUTPUT)
     (OUTPUT / "assets").mkdir(parents=True)
-    site_assets = {"article-reader.js", "favicon.svg", "site.css", "scott-ma.webp", "publications.js"}
+    site_assets = {"article-reader.js", "favicon.svg", "favicon.png", "site.css", "scott-ma.webp", "publications.js"}
     site_assets.update(image["asset"] for image in GALLERY)
     site_assets.update(image["asset"] for image in PAGE_IMAGES.values())
     for name in sorted(site_assets):
         shutil.copyfile(asset_path(name), OUTPUT / "assets" / name)
+    shutil.copyfile(asset_path("favicon.ico"), OUTPUT / "favicon.ico")
     write_profile_pages()
     write_publications()
     for old, new in site_aliases().items():
