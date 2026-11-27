@@ -7,8 +7,11 @@ import os
 from pathlib import Path
 import re
 import shutil
+import sys
 from string import Template
 from urllib.parse import urlsplit
+
+from profile_pages import PROFILE_PAGES, write_profile_pages
 
 
 PROJECT = Path(__file__).resolve().parent
@@ -24,7 +27,7 @@ PUBLICATIONS = json.loads((SOURCE / "publications.json").read_text(encoding="utf
 GALLERY_PATH = SOURCE / "gallery.json"
 GALLERY = json.loads(GALLERY_PATH.read_text(encoding="utf-8")) if GALLERY_PATH.exists() else []
 PAGE_IMAGES = json.loads((SOURCE / "page-images.json").read_text(encoding="utf-8"))
-NAVIGATION = {"": "Home", "research": "Research", "publications": "Publications", "cv": "CV"}
+NAVIGATION = {"": "Home", "#research": "Research", "publications": "Publications", "cv": "CV"}
 
 
 def inline(text):
@@ -137,7 +140,9 @@ def write_page(route, title, description, content, active=None, extra_head="", a
     navigation = []
     for key, label in NAVIGATION.items():
         current = ' aria-current="page"' if key == active else ""
-        navigation.append(f'<a href="{local_url(route, key)}"{current}>{label}</a>')
+        path_part, separator, fragment = key.partition("#")
+        href = local_url(route, path_part) + separator + fragment
+        navigation.append(f'<a href="{href}"{current}>{label}</a>')
 
     path.write_text(
         LAYOUT.substitute(
@@ -163,7 +168,7 @@ def write_alias(route, target):
     path.parent.mkdir(parents=True, exist_ok=True)
     relative = local_url(route, target)
     paper = next((item for item in PUBLICATIONS if target == f'publications/{item["slug"]}'), None)
-    title = paper["title"] if paper else {"research": SITE["researchTitle"], "cv": "Curriculum Vitae", "privacy": "Privacy Policy"}[target]
+    title = paper["title"] if paper else PROFILE_PAGES[target][0]
     description = plain_inline(paper.get("hook") or paper.get("abstract", "")) if paper else SITE["tagline"]
     path.write_text(
         f'''<!doctype html>
@@ -215,96 +220,6 @@ def image_credit(image):
     if license_label:
         credit += f' · {license_label}'
     return f'<p class="article-image-credit">{credit}</p>'
-
-
-def prose_page(heading, body):
-    return f'''<main id="main">
-  {page_header(heading)}
-  <div class="frame page-body"><div class="prose">{body}</div></div>
-</main>'''
-
-
-def gallery_html(location, asset_prefix):
-    figures = []
-    for image in GALLERY:
-        if image["location"] != location:
-            continue
-        asset = escape(asset_path(image["asset"]).name)
-        caption = inline(image["caption"])
-        alt = escape(image["alt"])
-        credit = escape(image["credit"])
-        source = https_url(image["source"])
-        rights = escape(image.get("licenseLabel", ""))
-        if rights and image.get("licenseUrl"):
-            rights = f'<a href="{https_url(image["licenseUrl"])}">{rights}</a>'
-        provenance = " · ".join(filter(None, (credit, f'<a href="{source}">Source</a>', rights)))
-        figures.append(f'''<figure>
-  <img src="{asset_prefix}{asset}" alt="{alt}" loading="lazy" decoding="async">
-  <figcaption><span class="figure-caption">{caption}</span><small>{provenance}</small></figcaption>
-</figure>''')
-    if not figures:
-        return ""
-    return f'''<section class="field-gallery" aria-label="Historical images">
-  <div class="gallery-grid">{"".join(figures)}</div>
-</section>'''
-
-
-def write_profile_pages():
-    name = escape(SITE["name"])
-    tagline = escape(SITE["tagline"])
-    affiliation = escape(SITE["affiliation"])
-    project = escape(SITE["researchTitle"])
-    subtitle = escape(SITE["researchSubtitle"])
-    google_verification = SITE.get("googleSiteVerification")
-    home_head = structured_data(**{"@type": "WebSite", "name": SITE_NAME,
-                                   "alternateName": SITE["name"], "url": origin_url("")})
-    if google_verification:
-        home_head += f'\n  <meta name="google-site-verification" content="{escape(google_verification)}">'
-    write_page("", SITE_NAME, SITE["tagline"], f'''<main id="main">
-  <div class="hero"><div class="frame hero-inner">
-    <div>
-      <h1>{name}</h1>
-      <p class="tagline">{tagline}</p>
-      <p class="affiliation">{affiliation}</p>
-    </div>
-    <figure class="portrait"><img src="./assets/scott-ma.webp" width="200" height="200" alt="Black-and-white Japanese illustration with figures and handwritten text"></figure>
-  </div></div>
-  <div class="frame home-body">
-    <section class="prose" aria-label="Biography">{markdown("home")}</section>
-    <div class="home-sidebar">
-      {gallery_html("home", "./assets/")}
-      <aside class="research-card" aria-labelledby="project-title">
-        <p class="label">Dissertation</p>
-        <h2 id="project-title">{project}</h2>
-        <p>{subtitle}</p>
-        <a href="./research/">Read about the project</a>
-      </aside>
-    </div>
-  </div>
-</main>''', extra_head=home_head)
-    dissertation_title = SITE["researchTitle"]
-    dissertation_description = f'{SITE["researchSubtitle"]}. Dissertation research by {SITE["name"]}.'
-    dissertation = f'''<main id="main" class="research-page">
-  {page_header(dissertation_title, SITE["researchSubtitle"], label="Dissertation")}
-  <div class="frame page-body dissertation-layout">
-    <section class="prose dissertation-abstract" id="dissertation-abstract" aria-label="Dissertation overview">
-      {markdown("research")}
-    </section>
-    {gallery_html("research", "../assets/")}
-  </div>
-</main>'''
-    write_page(
-        "research", f'{dissertation_title} | {SITE["name"]}', dissertation_description,
-        dissertation,
-        extra_head=structured_data(**{"@type": "WebPage", "name": dissertation_title, "url": origin_url("research"),
-                                     "description": dissertation_description,
-                                     "author": {"@type": "Person", "name": SITE["name"]},
-                                     "mainEntity": {"@type": "CreativeWork", "name": SITE["dissertationTitle"]}}),
-    )
-    cv = markdown("cv") + '\n<p>For my publication record, see <a href="../publications/">Publications</a>.</p>'
-    write_page("cv", f'CV | {SITE["name"]}', "Appointments, education, fellowships, and languages.", prose_page("Curriculum Vitae", cv))
-    privacy = markdown("privacy") + f'\n<p><a href="mailto:{escape(SITE["email"])}">Contact by email</a></p>'
-    write_page("privacy", f'Privacy | {SITE["name"]}', "Privacy practices for this academic website.", prose_page("Privacy Policy", privacy))
 
 
 def citation(paper, include_year=False, *, full=False):
@@ -394,11 +309,12 @@ def write_publications():
         year = paper["year"]
         title = escape(paper["title"])
         authors = escape(", ".join(paper["authors"]))
+        index_citation = citation({**paper, "journal": paper.get("shortJournal", paper["journal"])})
         rows.append(f'''<li class="publication-item" data-year="{year}">
   <span class="publication-year">{year}</span>
   <div><h2><a href="./{slug}/">{title}</a></h2>
     <p class="publication-byline">{authors}</p>
-    <p class="publication-journal">{citation(paper)}</p></div>
+    <p class="publication-journal">{index_citation}</p></div>
 </li>''')
         previous = papers[index - 1] if index else None
         following = papers[index + 1] if index + 1 < len(papers) else None
@@ -406,23 +322,17 @@ def write_publications():
 
     years = sorted({paper["year"] for paper in papers}, reverse=True)
     options = "".join(f'<option value="{year}">{year}</option>' for year in years)
-    listing = f'''<main id="main">
-  {page_header("Publications")}
-  <div class="frame page-body">
-    <section class="publications" data-publications aria-label="Journal articles">
+    listing = f'''<section class="publications" data-publications aria-label="Journal articles">
       <form class="filters" role="search" hidden>
         <label>Search publications<input type="search" name="query" placeholder="Title, author, or journal"></label>
         <label>Year<select name="year"><option value="">All years</option>{options}</select></label>
       </form>
       <p class="filter-status" role="status"></p>
       <ol class="publication-list">{"".join(rows)}</ol>
-      <p class="bibliography"><a href="./scott-ma.bib" download>Download bibliography (BibTeX)</a></p>
-    </section>
-  </div>
-</main>
-<script src="../assets/publications.js" defer></script>'''
-    write_page("publications", f'Publications | {SITE["name"]}', f'Journal articles by {SITE["name"]}.', listing)
+    </section>'''
+    (OUTPUT / "publications").mkdir(exist_ok=True)
     (OUTPUT / "publications/scott-ma.bib").write_text("\n".join(map(bibtex, papers)), encoding="utf-8")
+    return listing
 
 
 def visible_keyword(keyword):
@@ -737,10 +647,11 @@ def publication_metadata(paper, route, description, pdf_url):
 
 def site_aliases():
     aliases = {
-        "pages/9881": "research",
+        "research": "research/confucian-science",
+        "pages/9881": "research/confucian-science",
         "pages/9882": "cv",
         "privacy_policy": "privacy",
-        "confucius": "research",
+        "confucius": "research/confucian-science",
         "cvit": "cv",
     }
     for paper in PUBLICATIONS:
@@ -757,14 +668,14 @@ def build():
     if OUTPUT.exists():
         shutil.rmtree(OUTPUT)
     (OUTPUT / "assets").mkdir(parents=True)
-    site_assets = {"article-reader.js", "favicon.svg", "favicon.png", "site.css", "scott-ma.webp", "publications.js"}
+    site_assets = {"article-reader.js", "favicon.svg", "favicon.png", "site.css", "reader-chrome.css", "scott-ma.webp", "publications.js"}
     site_assets.update(image["asset"] for image in GALLERY)
     site_assets.update(image["asset"] for image in PAGE_IMAGES.values())
     for name in sorted(site_assets):
         shutil.copyfile(asset_path(name), OUTPUT / "assets" / name)
     shutil.copyfile(asset_path("favicon.ico"), OUTPUT / "favicon.ico")
-    write_profile_pages()
-    write_publications()
+    publication_listing = write_publications()
+    write_profile_pages(sys.modules[__name__], publication_listing)
     for old, new in site_aliases().items():
         write_alias(old, new)
         if old.startswith("publications/"):
@@ -772,7 +683,7 @@ def build():
                 source = OUTPUT / new / filename
                 if source.is_file():
                     shutil.copyfile(source, OUTPUT / old / filename)
-    urls = [origin_url(route) for route in [*NAVIGATION, "privacy", *(f'publications/{paper["slug"]}' for paper in PUBLICATIONS)]]
+    urls = [origin_url(route) for route in [*PROFILE_PAGES, *(f'publications/{paper["slug"]}' for paper in PUBLICATIONS)]]
     urls.extend(f'{origin_url(f"publications/{paper["slug"]}")}{publication_pdf_name(paper)}'
                 for paper in PUBLICATIONS if publication_pdf_name(paper))
     entries = "\n".join(f"  <url><loc>{escape(url)}</loc></url>" for url in urls)

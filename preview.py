@@ -28,6 +28,8 @@ def convert_links(body, folder):
             return match[0]
         target = (folder / url.path).resolve()
         fragment = f"#{escape(url.fragment)}" if url.fragment else ""
+        if target.name == "index.html":
+            target = target.parent
         if target.is_dir():
             route = target.relative_to(OUTPUT).as_posix().strip(".")
             return f'{attribute}="#/{route}{fragment}"'
@@ -43,6 +45,7 @@ def convert_links(body, folder):
 def preview():
     build()
     templates = []
+    stylesheets = {}
     for path in sorted(OUTPUT.rglob("index.html")):
         html = path.read_text(encoding="utf-8")
         if "<body>" not in html:
@@ -51,9 +54,20 @@ def preview():
         title = unescape(re.search(r"<title>(.*?)</title>", html)[1])
         body = html.split("<body>", 1)[1].split("</body>", 1)[0]
         portable = convert_links(body, path.parent)
-        templates.append(f'<template data-route="{route}" data-title="{escape(title)}">{portable}</template>')
+        styles = []
+        for href in re.findall(r'<link rel="stylesheet" href="([^"]+)"', html):
+            css = (path.parent / urlsplit(unescape(href)).path).resolve()
+            key = css.relative_to(OUTPUT).as_posix()
+            if key not in stylesheets:
+                stylesheets[key] = re.sub(
+                    r'url\((type/[^)]+)\)',
+                    lambda m: f'url("{data_url(css.parent / m[1])}")',
+                    css.read_text(encoding="utf-8"),
+                )
+            styles.append(key)
+        templates.append(f'<template data-route="{route}" data-title="{escape(title)}" data-styles="{" ".join(styles)}">{portable}</template>')
 
-    styles = (OUTPUT / "assets/site.css").read_text(encoding="utf-8")
+    style_tags = "\n".join(f'<style data-sheet="{key}" media="not all">{css}</style>' for key, css in stylesheets.items())
     filters = (OUTPUT / "assets/publications.js").read_text(encoding="utf-8")
     reader = (OUTPUT / "assets/article-reader.js").read_text(encoding="utf-8")
     favicon = data_url(OUTPUT / "assets/favicon.svg")
@@ -73,12 +87,16 @@ function render() {
     app.replaceChildren(page.content.cloneNode(true));
     activeRoute = page.dataset.route;
     document.title = page.dataset.title;
+    const styles = page.dataset.styles.split(" ");
+    document.querySelectorAll("style[data-sheet]").forEach(sheet => {
+      sheet.media = styles.includes(sheet.dataset.sheet) ? "all" : "not all";
+    });
     initializePublicationFilters(app);
     resetArticleReader = initializeArticleReader(app);
     app.querySelectorAll("[data-download-name]").forEach((link) => {
       link.download = link.dataset.downloadName;
     });
-    app.querySelector(".skip-link").addEventListener("click", (event) => {
+    app.querySelector(".skip, .skip-link").addEventListener("click", (event) => {
       event.preventDefault();
       const main = app.querySelector("main");
       main.tabIndex = -1;
@@ -115,7 +133,8 @@ render();
   <meta name="robots" content="noindex">
   <title>Scott Ma | Website preview</title>
   <link rel="icon" href="{favicon}">
-  <style>{styles}
+  {style_tags}
+  <style>
 #site {{ min-height: 100vh; display: flex; flex-direction: column; }}
   </style>
 </head>
