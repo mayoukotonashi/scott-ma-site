@@ -11,15 +11,16 @@
   <meta name="theme-color" content="#f8f7f2">
   $favicon_head
   <link rel="stylesheet" href="$root/assets/site.css?v=8">
+  <link rel="stylesheet" href="$root/assets/reader-chrome.css">
   $extra_head
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="frame header-inner">
-      <a class="wordmark" href="$root/" aria-label="$name, home">$name</a>
+      <a class="wordmark" href="$root/" aria-label="$name, home"><img src="$root/assets/woman-with-cat.webp" width="52" height="52" alt="">$name</a>
       <nav aria-label="Main navigation">$navigation</nav>
-      <a class="header-contact" href="mailto:$email">Email</a>
+      <a class="header-contact" href="mailto:$email">Contact</a>
     </div>
   </header>
   $content
@@ -27,10 +28,8 @@
     <div class="frame footer-inner">
       <div>
         <a class="wordmark" href="$root/">$name</a>
-        <p>$affiliation</p>
       </div>
       <div class="footer-links">
-        <a href="mailto:$email">$email</a>
         <a href="$root/privacy/">Privacy</a>
       </div>
     </div>
